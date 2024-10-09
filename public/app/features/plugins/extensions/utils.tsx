@@ -19,6 +19,7 @@ import {
   PluginContextType,
   PluginExtensionExposedComponentConfig,
   PluginExtensionAddedComponentConfig,
+  PluginExtensionPoints,
 } from '@grafana/data';
 import { reportInteraction, config } from '@grafana/runtime';
 import { Modal } from '@grafana/ui';
@@ -578,4 +579,91 @@ export const isExposedComponentMetaInfoMissing = (
   }
 
   return false;
+};
+
+export const getAppPluginConfigs = (pluginIds: string[] = []) =>
+  Object.values(config.apps).filter((app) => pluginIds.includes(app.id));
+
+export const getAppPluginIdFromExposedComponentId = (exposedComponentId: string) => {
+  return exposedComponentId.replace(/^plugins\//, '').split('/')[0];
+};
+
+// Returns a list of app plugin ids that are registering extensions to this extension point.
+// (These plugins are necessary to be loaded to use the extension point.)
+// (The function also returns the plugin ids that the plugins - that extend the extension point - depend on.)
+export const getExtensionPointPluginDependencies = (extensionPointId: string): string[] => {
+  return Object.values(config.apps)
+    .filter(
+      (app) =>
+        app.extensions.addedLinks.some((link) => link.targets.includes(extensionPointId)) ||
+        app.extensions.addedComponents.some((component) => component.targets.includes(extensionPointId))
+    )
+    .map((app) => app.id)
+    .reduce((acc: string[], id: string) => {
+      return [...acc, id, ...getAppPluginDependencies(id)];
+    }, []);
+};
+
+// Returns a list of app plugin ids that are necessary to be loaded to use the exposed component.
+// (It is first the plugin that exposes the component, and then the ones that it depends on.)
+export const getExposedComponentPluginDependencies = (exposedComponentId: string) => {
+  const pluginId = getAppPluginIdFromExposedComponentId(exposedComponentId);
+
+  return [pluginId].reduce((acc: string[], pluginId: string) => {
+    return [...acc, pluginId, ...getAppPluginDependencies(pluginId)];
+  }, []);
+};
+
+// Returns a list of app plugin ids that are necessary to be loaded, based on the `dependencies.extensions`
+// metadata field. (For example the plugins that expose components that the app depends on.)
+// Heads up! This is a recursive function.
+export const getAppPluginDependencies = (pluginId: string): string[] => {
+  if (!config.apps[pluginId]) {
+    return [];
+  }
+
+  const pluginIdDependencies = config.apps[pluginId].dependencies.extensions.exposedComponents.map(
+    getAppPluginIdFromExposedComponentId
+  );
+
+  return pluginIdDependencies.reduce((acc, pluginId) => {
+    return [...acc, ...getAppPluginDependencies(pluginId)];
+  }, pluginIdDependencies);
+};
+
+// Returns a list of app plugins that has to be loaded before core Grafana could finish the initialization.
+export const getAppPluginsToAwait = () => {
+  const pluginIds = [
+    // The "cloud-home-app" is registering banners once it's loaded, and this can cause a rerender in the AppChrome if it's loaded after the Grafana app init.
+    'cloud-home-app',
+  ];
+
+  return Object.values(config.apps).filter((app) => pluginIds.includes(app.id));
+};
+
+// Returns a list of app plugins that has to be preloaded in parallel with the core Grafana initialization.
+export const getAppPluginsToPreload = () => {
+  // The DashboardPanelMenu extension point is using the `getPluginExtensions()` API in scenes at the moment, which means that it cannot yet benefit from dynamic plugin loading.
+  const dashboardPanelMenuPluginIds = getExtensionPointPluginDependencies(PluginExtensionPoints.DashboardPanelMenu);
+  const isLazyLoadingEnabled = config.featureToggles.appPluginLazyLoading;
+  const awaitedPluginIds = getAppPluginsToAwait().map((app) => app.id);
+
+  if (!isLazyLoadingEnabled) {
+    return Object.values(config.apps)
+      .filter((app) => app.preload)
+      .filter((app) => !awaitedPluginIds.includes(app.id));
+  }
+
+  return Object.values(config.apps)
+    .filter((app) => app.preload)
+    .filter((app) => !awaitedPluginIds.includes(app.id))
+    .filter(
+      (app) =>
+        dashboardPanelMenuPluginIds.includes(app.id) ||
+        (!app.extensions.addedLinks.length &&
+          !app.extensions.addedComponents.length &&
+          !app.extensions.exposedComponents.length &&
+          !app.extensions.extensionPoints.length &&
+          !app.dependencies.extensions.exposedComponents.length)
+    );
 };

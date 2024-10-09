@@ -7,7 +7,8 @@ import { GetPluginExtensionsOptions, UsePluginExtensionsResult } from '@grafana/
 import { getPluginExtensions } from './getPluginExtensions';
 import { log } from './logs/log';
 import { PluginExtensionRegistries } from './registry/types';
-import { isExtensionPointMetaInfoMissing, isGrafanaDevMode } from './utils';
+import { useLoadAppPlugins } from './useLoadAppPlugins';
+import { getExtensionPointPluginDependencies, isExtensionPointMetaInfoMissing, isGrafanaDevMode } from './utils';
 import { isExtensionPointIdValid } from './validators';
 
 export function createUsePluginExtensions(registries: PluginExtensionRegistries) {
@@ -19,6 +20,7 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
     const addedComponentsRegistry = useObservable(observableAddedComponentsRegistry);
     const addedLinksRegistry = useObservable(observableAddedLinksRegistry);
     const { extensionPointId, context, limitPerPlugin } = options;
+    const { isLoading: isLoadingAppPlugins } = useLoadAppPlugins(getExtensionPointPluginDependencies(extensionPointId));
 
     const { extensions } = useMemo(() => {
       // For backwards compatibility we don't enable restrictions in production or when the hook is used in core Grafana.
@@ -53,6 +55,13 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
         };
       }
 
+      if (isLoadingAppPlugins) {
+        return {
+          isLoading: true,
+          extensions: [],
+        };
+      }
+
       return getPluginExtensions({
         extensionPointId,
         context,
@@ -64,7 +73,15 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
       // options object so we are checking it's simple value attributes.
       // The context though still has to be memoized though and not mutated.
       // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO: refactor `getPluginExtensions` to accept service dependencies as arguments instead of relying on the sidecar singleton under the hood
-    }, [addedLinksRegistry, addedComponentsRegistry, extensionPointId, context, limitPerPlugin, pluginContext]);
+    }, [
+      addedLinksRegistry,
+      addedComponentsRegistry,
+      extensionPointId,
+      context,
+      limitPerPlugin,
+      pluginContext,
+      isLoadingAppPlugins,
+    ]);
 
     return { extensions, isLoading: false };
   };

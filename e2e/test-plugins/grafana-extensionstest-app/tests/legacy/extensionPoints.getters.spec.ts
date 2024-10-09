@@ -4,6 +4,12 @@ import { ensureExtensionRegistryIsPopulated } from '../utils';
 import { testIds } from '../../testIds';
 import pluginJson from '../../plugin.json';
 
+test.use({
+  featureToggles: {
+    appPluginLazyLoading: false,
+  },
+});
+
 test.describe('getPluginExtensions + configureExtensionLink', () => {
   test('should extend the actions menu with a link to a-app plugin', async ({ page }) => {
     await page.goto(`/a/${pluginJson.id}/legacy-getters`);

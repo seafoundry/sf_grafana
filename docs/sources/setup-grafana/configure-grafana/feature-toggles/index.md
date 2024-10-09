@@ -220,6 +220,7 @@ Experimental features might be changed or removed without prior notice.
 | `playlistsWatcher`                            | Enables experimental watcher for playlists                                                                                                                                                                                                                                        |
 | `enableExtensionsAdminPage`                   | Enables the extension admin page regardless of development mode                                                                                                                                                                                                                   |
 | `zipkinBackendMigration`                      | Enables querying Zipkin data source without the proxy                                                                                                                                                                                                                             |
+| `appPluginLazyLoading`                        | Enables lazy-loading app plugins (stops preloading app plugins that have extensions related metadata info in their plugin.json)                                                                                                                                                   |
 
 ## Development feature toggles
 

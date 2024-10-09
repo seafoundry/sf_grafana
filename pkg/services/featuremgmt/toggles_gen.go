@@ -866,4 +866,8 @@ const (
 	// FlagZipkinBackendMigration
 	// Enables querying Zipkin data source without the proxy
 	FlagZipkinBackendMigration = "zipkinBackendMigration"
+	
+	// FlagAppPluginLazyLoading
+	// Enables lazy-loading app plugins (stops preloading app plugins that have extensions related metadata info in their plugin.json)
+	FlagAppPluginLazyLoading = "appPluginLazyLoading"
 )

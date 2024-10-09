@@ -20,6 +20,9 @@ export default defineConfig<PluginOptions>({
       password: 'admin',
     },
     provisioningRootDir: path.join(process.cwd(), process.env.PROV_DIR ?? 'conf/provisioning'),
+    featureToggles: {
+      appPluginLazyLoading: true,
+    },
   },
   projects: [
     // Login to Grafana with admin user and store the cookie on disk for use in other tests
