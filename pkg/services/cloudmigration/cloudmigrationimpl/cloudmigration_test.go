@@ -655,6 +655,7 @@ func TestGetParentNames(t *testing.T) {
 		folders             []folder.CreateFolderCommand
 		dashboards          []dashboards.Dashboard
 		libraryElements     []libraryElement
+		alertRules          []alertRule
 		expectedParentNames map[cloudmigration.MigrateDataType][]string
 	}{
 		{
@@ -675,10 +676,15 @@ func TestGetParentNames(t *testing.T) {
 				{UID: "libraryElementUID-0", FolderUID: &libraryElementFolderUID},
 				{UID: "libraryElementUID-1"},
 			},
+			alertRules: []alertRule{
+				{UID: "alertRuleUID-0", FolderUID: ""},
+				{UID: "alertRuleUID-1", FolderUID: "folderUID-B"},
+			},
 			expectedParentNames: map[cloudmigration.MigrateDataType][]string{
-				cloudmigration.DashboardDataType:      []string{"", "Folder A", "Folder B"},
-				cloudmigration.FolderDataType:         []string{"Folder A"},
-				cloudmigration.LibraryElementDataType: []string{"Folder A"},
+				cloudmigration.DashboardDataType:      {"", "Folder A", "Folder B"},
+				cloudmigration.FolderDataType:         {"Folder A"},
+				cloudmigration.LibraryElementDataType: {"Folder A"},
+				cloudmigration.AlertRuleType:          {"Folder B"},
 			},
 		},
 	}
@@ -686,7 +692,7 @@ func TestGetParentNames(t *testing.T) {
 	for _, tc := range testcases {
 		s.folderService = &foldertest.FakeService{ExpectedFolders: tc.fakeFolders}
 
-		dataUIDsToParentNamesByType, err := s.getParentNames(ctx, user, tc.dashboards, tc.folders, tc.libraryElements)
+		dataUIDsToParentNamesByType, err := s.getParentNames(ctx, user, tc.dashboards, tc.folders, tc.libraryElements, tc.alertRules)
 		require.NoError(t, err)
 
 		for dataType, expectedParentNames := range tc.expectedParentNames {
