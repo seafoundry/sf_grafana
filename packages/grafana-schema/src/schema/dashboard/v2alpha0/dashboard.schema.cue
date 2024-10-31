@@ -40,7 +40,7 @@ DashboardSpec: {
   // Configured template variables.
   variables: [...QueryVariableKind | TextVariableKind]
 
-  elements: Referenceable
+  elements: [ElementReferenceKind.spec.id]: PanelKind // |* more element types in the future
 
   annotations: [...AnnotationQueryKind]
 
@@ -341,12 +341,6 @@ Kind: {
     metadata?: _
 }
 
-Reference: {
-  $ref: string
-}
-
-Referenceable: [string]: _
-
 // --- Kinds ---
 VizConfigSpec: {
   pluginVersion: string
@@ -465,7 +459,7 @@ GridLayoutItemSpec: {
   y: int
   width: int
   height: int
-  element: Reference // reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
+  element: ElementReferenceKind // reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
 }
 
 GridLayoutItemKind: {
@@ -502,5 +496,5 @@ ElementReferenceKind: {
 }
 
 ElementReferenceSpec: {
-  name: string
+  id: string
 }

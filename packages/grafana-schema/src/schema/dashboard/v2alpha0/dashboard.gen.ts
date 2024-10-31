@@ -36,7 +36,8 @@ export interface DashboardSpec {
 	timeSettings: TimeSettingsSpec;
 	// Configured template variables.
 	variables: (QueryVariableKind | TextVariableKind)[];
-	elements: Referenceable;
+	// |* more element types in the future
+	elements: Record<string, PanelKind>;
 	annotations: AnnotationQueryKind[];
 	// revision?: int // for plugins only
 	// gnetId?: string // ??? Wat is this used for?
@@ -50,298 +51,9 @@ export const defaultDashboardSpec = (): DashboardSpec => ({
 	links: [],
 	timeSettings: defaultTimeSettingsSpec(),
 	variables: [],
-	elements: defaultReferenceable(),
+	elements: {},
 	annotations: [],
 	layout: defaultGridLayoutKind(),
-});
-
-export interface VizConfigSpec {
-	pluginVersion: string;
-	options: Record<string, any>;
-	fieldConfig: FieldConfigSource;
-}
-
-export const defaultVizConfigSpec = (): VizConfigSpec => ({
-	pluginVersion: "",
-	options: {},
-	fieldConfig: defaultFieldConfigSource(),
-});
-
-export interface VizConfigKind {
-	kind: string;
-	spec: VizConfigSpec;
-}
-
-export const defaultVizConfigKind = (): VizConfigKind => ({
-	kind: "",
-	spec: defaultVizConfigSpec(),
-});
-
-export interface AnnotationQuerySpec {
-	datasource: DataSourceRef;
-	query: DataQueryKind;
-	// TODO: Should be figured out based on datasource (Grafana ds)
-	// builtIn?: int
-	// Below are currently existing options for annotation queries
-	enable: boolean;
-	filter: AnnotationPanelFilter;
-	hide: boolean;
-	iconColor: string;
-	name: string;
-}
-
-export const defaultAnnotationQuerySpec = (): AnnotationQuerySpec => ({
-	datasource: defaultDataSourceRef(),
-	query: defaultDataQueryKind(),
-	enable: false,
-	filter: defaultAnnotationPanelFilter(),
-	hide: false,
-	iconColor: "",
-	name: "",
-});
-
-export interface AnnotationQueryKind {
-	kind: "AnnotationQuery";
-	spec: AnnotationQuerySpec;
-}
-
-export const defaultAnnotationQueryKind = (): AnnotationQueryKind => ({
-	kind: "AnnotationQuery",
-	spec: defaultAnnotationQuerySpec(),
-});
-
-export interface QueryOptionsSpec {
-	timeFrom?: string;
-	maxDataPoints?: number;
-	timeShift?: string;
-	queryCachingTTL?: number;
-	interval?: string;
-	cacheTimeout?: string;
-}
-
-export const defaultQueryOptionsSpec = (): QueryOptionsSpec => ({
-});
-
-export interface DataQueryKind {
-	kind: string;
-	spec: Record<string, any>;
-}
-
-export const defaultDataQueryKind = (): DataQueryKind => ({
-	kind: "",
-	spec: {},
-});
-
-export interface PanelQuerySpec {
-	query: DataQueryKind;
-	datasource: DataSourceRef;
-	refId: string;
-	hidden: boolean;
-}
-
-export const defaultPanelQuerySpec = (): PanelQuerySpec => ({
-	query: defaultDataQueryKind(),
-	datasource: defaultDataSourceRef(),
-	refId: "",
-	hidden: false,
-});
-
-export interface PanelQueryKind {
-	kind: "PanelQuery";
-	spec: PanelQuerySpec;
-}
-
-export const defaultPanelQueryKind = (): PanelQueryKind => ({
-	kind: "PanelQuery",
-	spec: defaultPanelQuerySpec(),
-});
-
-export interface TransformationKind {
-	kind: string;
-	spec: DataTransformerConfig;
-}
-
-export const defaultTransformationKind = (): TransformationKind => ({
-	kind: "",
-	spec: defaultDataTransformerConfig(),
-});
-
-export interface QueryGroupSpec {
-	queries: PanelQueryKind[];
-	transformations: TransformationKind[];
-	queryOptions: QueryOptionsSpec;
-}
-
-export const defaultQueryGroupSpec = (): QueryGroupSpec => ({
-	queries: [],
-	transformations: [],
-	queryOptions: defaultQueryOptionsSpec(),
-});
-
-export interface QueryGroupKind {
-	kind: "QueryGroup";
-	spec: QueryGroupSpec;
-}
-
-export const defaultQueryGroupKind = (): QueryGroupKind => ({
-	kind: "QueryGroup",
-	spec: defaultQueryGroupSpec(),
-});
-
-export type QueryVariableSpec = any;
-
-export const defaultQueryVariableSpec = (): QueryVariableSpec => ({});
-
-export interface QueryVariableKind {
-	kind: "QueryVariable";
-	spec: QueryVariableSpec;
-}
-
-export const defaultQueryVariableKind = (): QueryVariableKind => ({
-	kind: "QueryVariable",
-	spec: defaultQueryVariableSpec(),
-});
-
-export type TextVariableSpec = any;
-
-export const defaultTextVariableSpec = (): TextVariableSpec => ({});
-
-export interface TextVariableKind {
-	kind: "TextVariable";
-	spec: TextVariableSpec;
-}
-
-export const defaultTextVariableKind = (): TextVariableKind => ({
-	kind: "TextVariable",
-	spec: defaultTextVariableSpec(),
-});
-
-// Time configuration
-// It defines the default time config for the time picker, the refresh picker for the specific dashboard.
-export interface TimeSettingsSpec {
-	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
-	timezone?: string;
-	// Start time range for dashboard.
-	// Accepted values are relative time strings like 'now-6h' or absolute time strings like '2020-07-10T08:00:00.000Z'.
-	from: string;
-	// End time range for dashboard.
-	// Accepted values are relative time strings like 'now-6h' or absolute time strings like '2020-07-10T08:00:00.000Z'.
-	to: string;
-	// Refresh rate of dashboard. Represented via interval string, e.g. "5s", "1m", "1h", "1d".
-	// v1: refresh
-	autoRefresh: string;
-	// Interval options available in the refresh picker dropdown.
-	// v1: timepicker.refresh_intervals
-	autoRefreshIntervals: string[];
-	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
-	// v1: timepicker.time_options , not exposed in the UI
-	quickRanges: string[];
-	// Whether timepicker is visible or not.
-	// v1: timepicker.hidden
-	hideTimepicker: boolean;
-	// Day when the week starts. Expressed by the name of the day in lowercase, e.g. "monday".
-	weekStart: string;
-	// The month that the fiscal year starts on. 0 = January, 11 = December
-	fiscalYearStartMonth: number;
-	// Override the now time by entering a time delay. Use this option to accommodate known delays in data aggregation to avoid null values.
-	// v1: timepicker.nowDelay
-	nowDelay?: string;
-}
-
-export const defaultTimeSettingsSpec = (): TimeSettingsSpec => ({
-	timezone: "browser",
-	from: "now-6h",
-	to: "now",
-	autoRefresh: "",
-	autoRefreshIntervals: [
-"5s",
-"10s",
-"30s",
-"1m",
-"5m",
-"15m",
-"30m",
-"1h",
-"2h",
-"1d",
-],
-	quickRanges: [
-"5m",
-"15m",
-"1h",
-"6h",
-"12h",
-"24h",
-"2d",
-"7d",
-"30d",
-],
-	hideTimepicker: false,
-	weekStart: "",
-	fiscalYearStartMonth: 0,
-});
-
-export interface GridLayoutItemSpec {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	// reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
-	element: Reference;
-}
-
-export const defaultGridLayoutItemSpec = (): GridLayoutItemSpec => ({
-	x: 0,
-	y: 0,
-	width: 0,
-	height: 0,
-	element: defaultReference(),
-});
-
-export interface GridLayoutItemKind {
-	kind: "GridLayoutItem";
-	spec: GridLayoutItemSpec;
-}
-
-export const defaultGridLayoutItemKind = (): GridLayoutItemKind => ({
-	kind: "GridLayoutItem",
-	spec: defaultGridLayoutItemSpec(),
-});
-
-export interface GridLayoutSpec {
-	items: GridLayoutItemKind[];
-}
-
-export const defaultGridLayoutSpec = (): GridLayoutSpec => ({
-	items: [],
-});
-
-export interface GridLayoutKind {
-	kind: "GridLayout";
-	spec: GridLayoutSpec;
-}
-
-export const defaultGridLayoutKind = (): GridLayoutKind => ({
-	kind: "GridLayout",
-	spec: defaultGridLayoutSpec(),
-});
-
-export interface PanelSpec {
-	uid: string;
-	title: string;
-	description: string;
-	links: DashboardLink[];
-	data: QueryGroupKind;
-	vizConfig: VizConfigKind;
-}
-
-export const defaultPanelSpec = (): PanelSpec => ({
-	uid: "",
-	title: "",
-	description: "",
-	links: [],
-	data: defaultQueryGroupKind(),
-	vizConfig: defaultVizConfigKind(),
 });
 
 export interface AnnotationPanelFilter {
@@ -756,6 +468,308 @@ export enum DashboardLinkType {
 
 export const defaultDashboardLinkType = (): DashboardLinkType => (DashboardLinkType.Link);
 
+// --- Common types ---
+export interface Kind {
+	kind: string;
+	spec: any;
+	metadata?: any;
+}
+
+export const defaultKind = (): Kind => ({
+	kind: "",
+	spec: {},
+});
+
+// --- Kinds ---
+export interface VizConfigSpec {
+	pluginVersion: string;
+	options: Record<string, any>;
+	fieldConfig: FieldConfigSource;
+}
+
+export const defaultVizConfigSpec = (): VizConfigSpec => ({
+	pluginVersion: "",
+	options: {},
+	fieldConfig: defaultFieldConfigSource(),
+});
+
+export interface VizConfigKind {
+	kind: string;
+	spec: VizConfigSpec;
+}
+
+export const defaultVizConfigKind = (): VizConfigKind => ({
+	kind: "",
+	spec: defaultVizConfigSpec(),
+});
+
+export interface AnnotationQuerySpec {
+	datasource: DataSourceRef;
+	query: DataQueryKind;
+	// TODO: Should be figured out based on datasource (Grafana ds)
+	// builtIn?: int
+	// Below are currently existing options for annotation queries
+	enable: boolean;
+	filter: AnnotationPanelFilter;
+	hide: boolean;
+	iconColor: string;
+	name: string;
+}
+
+export const defaultAnnotationQuerySpec = (): AnnotationQuerySpec => ({
+	datasource: defaultDataSourceRef(),
+	query: defaultDataQueryKind(),
+	enable: false,
+	filter: defaultAnnotationPanelFilter(),
+	hide: false,
+	iconColor: "",
+	name: "",
+});
+
+export interface AnnotationQueryKind {
+	kind: "AnnotationQuery";
+	spec: AnnotationQuerySpec;
+}
+
+export const defaultAnnotationQueryKind = (): AnnotationQueryKind => ({
+	kind: "AnnotationQuery",
+	spec: defaultAnnotationQuerySpec(),
+});
+
+export interface QueryOptionsSpec {
+	timeFrom?: string;
+	maxDataPoints?: number;
+	timeShift?: string;
+	queryCachingTTL?: number;
+	interval?: string;
+	cacheTimeout?: string;
+}
+
+export const defaultQueryOptionsSpec = (): QueryOptionsSpec => ({
+});
+
+export interface DataQueryKind {
+	kind: string;
+	spec: Record<string, any>;
+}
+
+export const defaultDataQueryKind = (): DataQueryKind => ({
+	kind: "",
+	spec: {},
+});
+
+export interface PanelQuerySpec {
+	query: DataQueryKind;
+	datasource: DataSourceRef;
+	refId: string;
+	hidden: boolean;
+}
+
+export const defaultPanelQuerySpec = (): PanelQuerySpec => ({
+	query: defaultDataQueryKind(),
+	datasource: defaultDataSourceRef(),
+	refId: "",
+	hidden: false,
+});
+
+export interface PanelQueryKind {
+	kind: "PanelQuery";
+	spec: PanelQuerySpec;
+}
+
+export const defaultPanelQueryKind = (): PanelQueryKind => ({
+	kind: "PanelQuery",
+	spec: defaultPanelQuerySpec(),
+});
+
+export interface TransformationKind {
+	kind: string;
+	spec: DataTransformerConfig;
+}
+
+export const defaultTransformationKind = (): TransformationKind => ({
+	kind: "",
+	spec: defaultDataTransformerConfig(),
+});
+
+export interface QueryGroupSpec {
+	queries: PanelQueryKind[];
+	transformations: TransformationKind[];
+	queryOptions: QueryOptionsSpec;
+}
+
+export const defaultQueryGroupSpec = (): QueryGroupSpec => ({
+	queries: [],
+	transformations: [],
+	queryOptions: defaultQueryOptionsSpec(),
+});
+
+export interface QueryGroupKind {
+	kind: "QueryGroup";
+	spec: QueryGroupSpec;
+}
+
+export const defaultQueryGroupKind = (): QueryGroupKind => ({
+	kind: "QueryGroup",
+	spec: defaultQueryGroupSpec(),
+});
+
+export type QueryVariableSpec = any;
+
+export const defaultQueryVariableSpec = (): QueryVariableSpec => ({});
+
+export interface QueryVariableKind {
+	kind: "QueryVariable";
+	spec: QueryVariableSpec;
+}
+
+export const defaultQueryVariableKind = (): QueryVariableKind => ({
+	kind: "QueryVariable",
+	spec: defaultQueryVariableSpec(),
+});
+
+export type TextVariableSpec = any;
+
+export const defaultTextVariableSpec = (): TextVariableSpec => ({});
+
+export interface TextVariableKind {
+	kind: "TextVariable";
+	spec: TextVariableSpec;
+}
+
+export const defaultTextVariableKind = (): TextVariableKind => ({
+	kind: "TextVariable",
+	spec: defaultTextVariableSpec(),
+});
+
+// Time configuration
+// It defines the default time config for the time picker, the refresh picker for the specific dashboard.
+export interface TimeSettingsSpec {
+	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
+	timezone?: string;
+	// Start time range for dashboard.
+	// Accepted values are relative time strings like 'now-6h' or absolute time strings like '2020-07-10T08:00:00.000Z'.
+	from: string;
+	// End time range for dashboard.
+	// Accepted values are relative time strings like 'now-6h' or absolute time strings like '2020-07-10T08:00:00.000Z'.
+	to: string;
+	// Refresh rate of dashboard. Represented via interval string, e.g. "5s", "1m", "1h", "1d".
+	// v1: refresh
+	autoRefresh: string;
+	// Interval options available in the refresh picker dropdown.
+	// v1: timepicker.refresh_intervals
+	autoRefreshIntervals: string[];
+	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
+	// v1: timepicker.time_options , not exposed in the UI
+	quickRanges: string[];
+	// Whether timepicker is visible or not.
+	// v1: timepicker.hidden
+	hideTimepicker: boolean;
+	// Day when the week starts. Expressed by the name of the day in lowercase, e.g. "monday".
+	weekStart: string;
+	// The month that the fiscal year starts on. 0 = January, 11 = December
+	fiscalYearStartMonth: number;
+	// Override the now time by entering a time delay. Use this option to accommodate known delays in data aggregation to avoid null values.
+	// v1: timepicker.nowDelay
+	nowDelay?: string;
+}
+
+export const defaultTimeSettingsSpec = (): TimeSettingsSpec => ({
+	timezone: "browser",
+	from: "now-6h",
+	to: "now",
+	autoRefresh: "",
+	autoRefreshIntervals: [
+"5s",
+"10s",
+"30s",
+"1m",
+"5m",
+"15m",
+"30m",
+"1h",
+"2h",
+"1d",
+],
+	quickRanges: [
+"5m",
+"15m",
+"1h",
+"6h",
+"12h",
+"24h",
+"2d",
+"7d",
+"30d",
+],
+	hideTimepicker: false,
+	weekStart: "",
+	fiscalYearStartMonth: 0,
+});
+
+export interface GridLayoutItemSpec {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	// reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
+	element: ElementReferenceKind;
+}
+
+export const defaultGridLayoutItemSpec = (): GridLayoutItemSpec => ({
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
+	element: defaultElementReferenceKind(),
+});
+
+export interface GridLayoutItemKind {
+	kind: "GridLayoutItem";
+	spec: GridLayoutItemSpec;
+}
+
+export const defaultGridLayoutItemKind = (): GridLayoutItemKind => ({
+	kind: "GridLayoutItem",
+	spec: defaultGridLayoutItemSpec(),
+});
+
+export interface GridLayoutSpec {
+	items: GridLayoutItemKind[];
+}
+
+export const defaultGridLayoutSpec = (): GridLayoutSpec => ({
+	items: [],
+});
+
+export interface GridLayoutKind {
+	kind: "GridLayout";
+	spec: GridLayoutSpec;
+}
+
+export const defaultGridLayoutKind = (): GridLayoutKind => ({
+	kind: "GridLayout",
+	spec: defaultGridLayoutSpec(),
+});
+
+export interface PanelSpec {
+	uid: string;
+	title: string;
+	description: string;
+	links: DashboardLink[];
+	data: QueryGroupKind;
+	vizConfig: VizConfigKind;
+}
+
+export const defaultPanelSpec = (): PanelSpec => ({
+	uid: "",
+	title: "",
+	description: "",
+	links: [],
+	data: defaultQueryGroupKind(),
+	vizConfig: defaultVizConfigKind(),
+});
+
 export interface PanelKind {
 	kind: "Panel";
 	spec: PanelSpec;
@@ -766,15 +780,21 @@ export const defaultPanelKind = (): PanelKind => ({
 	spec: defaultPanelSpec(),
 });
 
-export interface Reference {
-	$ref: string;
+export interface ElementReferenceKind {
+	kind: "ElementReference";
+	spec: ElementReferenceSpec;
 }
 
-export const defaultReference = (): Reference => ({
-	$ref: "",
+export const defaultElementReferenceKind = (): ElementReferenceKind => ({
+	kind: "ElementReference",
+	spec: defaultElementReferenceSpec(),
 });
 
-export type Referenceable = Record<string, any>;
+export interface ElementReferenceSpec {
+	id: string;
+}
 
-export const defaultReferenceable = (): Referenceable => ({});
+export const defaultElementReferenceSpec = (): ElementReferenceSpec => ({
+	id: "",
+});
 

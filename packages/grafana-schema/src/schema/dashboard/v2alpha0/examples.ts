@@ -1,4 +1,4 @@
-import { DashboardV2 } from './dashboard.schema';
+import { DashboardV2 } from './dashboard.gen';
 
 export const handyTestingSchema: DashboardV2 = {
   kind: 'Dashboard',
@@ -89,7 +89,7 @@ export const handyTestingSchema: DashboardV2 = {
           {
             kind: 'GridLayoutItem',
             spec: {
-              element: { $ref: '#/spec/elements/timeSeriesTest' },
+              element: { kind: 'ElementReference', spec: { id: 'timeSeriesTest' } },
               x: 0,
               y: 0,
               width: 12,
