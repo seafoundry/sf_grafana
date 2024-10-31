@@ -791,10 +791,10 @@ export const defaultElementReferenceKind = (): ElementReferenceKind => ({
 });
 
 export interface ElementReferenceSpec {
-	id: string;
+	name: string;
 }
 
 export const defaultElementReferenceSpec = (): ElementReferenceSpec => ({
-	id: "",
+	name: "",
 });
 

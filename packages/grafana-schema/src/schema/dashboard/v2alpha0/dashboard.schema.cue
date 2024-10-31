@@ -40,7 +40,7 @@ DashboardSpec: {
   // Configured template variables.
   variables: [...QueryVariableKind | TextVariableKind]
 
-  elements: [ElementReferenceKind.spec.id]: PanelKind // |* more element types in the future
+  elements: [ElementReferenceKind.spec.name]: PanelKind // |* more element types in the future
 
   annotations: [...AnnotationQueryKind]
 
@@ -496,5 +496,5 @@ ElementReferenceKind: {
 }
 
 ElementReferenceSpec: {
-  id: string
+  name: string
 }

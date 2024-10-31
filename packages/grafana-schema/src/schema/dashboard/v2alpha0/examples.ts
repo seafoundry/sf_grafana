@@ -89,7 +89,7 @@ export const handyTestingSchema: DashboardV2 = {
           {
             kind: 'GridLayoutItem',
             spec: {
-              element: { kind: 'ElementReference', spec: { id: 'timeSeriesTest' } },
+              element: { kind: 'ElementReference', spec: { name: 'timeSeriesTest' } },
               x: 0,
               y: 0,
               width: 12,
