@@ -28,6 +28,12 @@ github.com/grafana/codejen v0.0.4-0.20230321061741-77f656893a3d h1:hrXbGJ5jgp6yN
 github.com/grafana/codejen v0.0.4-0.20230321061741-77f656893a3d/go.mod h1:zmwwM/DRyQB7pfuBjTWII3CWtxcXh8LTwAYGfDfpR6s=
 github.com/grafana/cog v0.0.0-20241029201114-f7f7db0c1070 h1:ncAkFmIq3UbPiPhQ2CuBzdTuwnDqLsFFNqEIXKaiPGA=
 github.com/grafana/cog v0.0.0-20241029201114-f7f7db0c1070/go.mod h1:FqZi9WZ/Uzvs3tvo7l+OViThCpfvu3KDGDqHCB2LNbg=
+github.com/grafana/cog v0.0.2-0.20241101113503-3ce06ebf6577 h1:4OfKmbVL8xP3MeLYBBiXX+r2zCkTT4nOB1tTttDTpo4=
+github.com/grafana/cog v0.0.2-0.20241101113503-3ce06ebf6577/go.mod h1:FqZi9WZ/Uzvs3tvo7l+OViThCpfvu3KDGDqHCB2LNbg=
+github.com/grafana/cog v0.0.2-0.20241101122817-20ab7cf0b1c9 h1:DRzAV3mVuoNCAHINX9wxzi8ny0AL4J37kpE0AIDjlcA=
+github.com/grafana/cog v0.0.2-0.20241101122817-20ab7cf0b1c9/go.mod h1:FqZi9WZ/Uzvs3tvo7l+OViThCpfvu3KDGDqHCB2LNbg=
+github.com/grafana/cog v0.0.2-0.20241101123801-8d8135cb0c68 h1:WcTnsTokad1LytTL3XSbuHXxYIiQndnflXrWPeeDkRQ=
+github.com/grafana/cog v0.0.2-0.20241101123801-8d8135cb0c68/go.mod h1:FqZi9WZ/Uzvs3tvo7l+OViThCpfvu3KDGDqHCB2LNbg=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=
 github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=

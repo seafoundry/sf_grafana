@@ -1,5 +1,45 @@
 // Code generated - EDITING IS FUTILE. DO NOT EDIT.
 
+// --- Common types ---
+export interface Kind {
+	kind: string;
+	spec: any;
+	metadata?: any;
+}
+
+export const defaultKind = (): Kind => ({
+	kind: "",
+	spec: {},
+});
+
+export interface ElementReferenceKind {
+	kind: "ElementReference";
+	spec: ElementReferenceSpec;
+}
+
+export const defaultElementReferenceKind = (): ElementReferenceKind => ({
+	kind: "ElementReference",
+	spec: defaultElementReferenceSpec(),
+});
+
+export interface ElementReferenceSpec {
+	name: string;
+}
+
+export const defaultElementReferenceSpec = (): ElementReferenceSpec => ({
+	name: "",
+});
+
+export interface DataSourceRef {
+	// The plugin type-id
+	type?: string;
+	// Specific datasource instance
+	uid?: string;
+}
+
+export const defaultDataSourceRef = (): DataSourceRef => ({
+});
+
 export interface DashboardV2 {
 	kind: "Dashboard";
 	spec: DashboardSpec;
@@ -116,39 +156,6 @@ export const defaultDashboardLink = (): DashboardLink => ({
 	keepTime: false,
 });
 
-export interface DataSourceRef {
-	// The plugin type-id
-	type?: string;
-	// Specific datasource instance
-	uid?: string;
-}
-
-export const defaultDataSourceRef = (): DataSourceRef => ({
-});
-
-// Transformations allow to manipulate data returned by a query before the system applies a visualization.
-// Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
-// use the output of one transformation as the input to another transformation, etc.
-export interface DataTransformerConfig {
-	// Unique identifier of transformer
-	id: string;
-	// Disabled transformations are skipped
-	disabled?: boolean;
-	// Optional frame matcher. When missing it will be applied to all results
-	filter?: MatcherConfig;
-	// Where to pull DataFrames from as input to transformation
-	// replaced with common.DataTopic
-	topic?: "series" | "annotations" | "alertStates";
-	// Options to be passed to the transformer
-	// Valid options depend on the transformer id
-	options: any;
-}
-
-export const defaultDataTransformerConfig = (): DataTransformerConfig => ({
-	id: "",
-	options: {},
-});
-
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
@@ -232,19 +239,6 @@ export interface DynamicConfigValue {
 }
 
 export const defaultDynamicConfigValue = (): DynamicConfigValue => ({
-	id: "",
-});
-
-// Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
-// It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
-export interface MatcherConfig {
-	// The matcher id. This is used to find the matcher implementation from registry.
-	id: string;
-	// The matcher options. This is specific to the matcher implementation.
-	options?: any;
-}
-
-export const defaultMatcherConfig = (): MatcherConfig => ({
 	id: "",
 });
 
@@ -468,18 +462,6 @@ export enum DashboardLinkType {
 
 export const defaultDashboardLinkType = (): DashboardLinkType => (DashboardLinkType.Link);
 
-// --- Common types ---
-export interface Kind {
-	kind: string;
-	spec: any;
-	metadata?: any;
-}
-
-export const defaultKind = (): Kind => ({
-	kind: "",
-	spec: {},
-});
-
 // --- Kinds ---
 export interface VizConfigSpec {
 	pluginVersion: string;
@@ -534,112 +516,6 @@ export interface AnnotationQueryKind {
 export const defaultAnnotationQueryKind = (): AnnotationQueryKind => ({
 	kind: "AnnotationQuery",
 	spec: defaultAnnotationQuerySpec(),
-});
-
-export interface QueryOptionsSpec {
-	timeFrom?: string;
-	maxDataPoints?: number;
-	timeShift?: string;
-	queryCachingTTL?: number;
-	interval?: string;
-	cacheTimeout?: string;
-}
-
-export const defaultQueryOptionsSpec = (): QueryOptionsSpec => ({
-});
-
-export interface DataQueryKind {
-	kind: string;
-	spec: Record<string, any>;
-}
-
-export const defaultDataQueryKind = (): DataQueryKind => ({
-	kind: "",
-	spec: {},
-});
-
-export interface PanelQuerySpec {
-	query: DataQueryKind;
-	datasource: DataSourceRef;
-	refId: string;
-	hidden: boolean;
-}
-
-export const defaultPanelQuerySpec = (): PanelQuerySpec => ({
-	query: defaultDataQueryKind(),
-	datasource: defaultDataSourceRef(),
-	refId: "",
-	hidden: false,
-});
-
-export interface PanelQueryKind {
-	kind: "PanelQuery";
-	spec: PanelQuerySpec;
-}
-
-export const defaultPanelQueryKind = (): PanelQueryKind => ({
-	kind: "PanelQuery",
-	spec: defaultPanelQuerySpec(),
-});
-
-export interface TransformationKind {
-	kind: string;
-	spec: DataTransformerConfig;
-}
-
-export const defaultTransformationKind = (): TransformationKind => ({
-	kind: "",
-	spec: defaultDataTransformerConfig(),
-});
-
-export interface QueryGroupSpec {
-	queries: PanelQueryKind[];
-	transformations: TransformationKind[];
-	queryOptions: QueryOptionsSpec;
-}
-
-export const defaultQueryGroupSpec = (): QueryGroupSpec => ({
-	queries: [],
-	transformations: [],
-	queryOptions: defaultQueryOptionsSpec(),
-});
-
-export interface QueryGroupKind {
-	kind: "QueryGroup";
-	spec: QueryGroupSpec;
-}
-
-export const defaultQueryGroupKind = (): QueryGroupKind => ({
-	kind: "QueryGroup",
-	spec: defaultQueryGroupSpec(),
-});
-
-export type QueryVariableSpec = any;
-
-export const defaultQueryVariableSpec = (): QueryVariableSpec => ({});
-
-export interface QueryVariableKind {
-	kind: "QueryVariable";
-	spec: QueryVariableSpec;
-}
-
-export const defaultQueryVariableKind = (): QueryVariableKind => ({
-	kind: "QueryVariable",
-	spec: defaultQueryVariableSpec(),
-});
-
-export type TextVariableSpec = any;
-
-export const defaultTextVariableSpec = (): TextVariableSpec => ({});
-
-export interface TextVariableKind {
-	kind: "TextVariable";
-	spec: TextVariableSpec;
-}
-
-export const defaultTextVariableKind = (): TextVariableKind => ({
-	kind: "TextVariable",
-	spec: defaultTextVariableSpec(),
 });
 
 // Time configuration
@@ -707,6 +583,24 @@ export const defaultTimeSettingsSpec = (): TimeSettingsSpec => ({
 	fiscalYearStartMonth: 0,
 });
 
+export interface PanelSpec {
+	uid: string;
+	title: string;
+	description: string;
+	links: DashboardLink[];
+	data: QueryGroupKind;
+	vizConfig: VizConfigKind;
+}
+
+export const defaultPanelSpec = (): PanelSpec => ({
+	uid: "",
+	title: "",
+	description: "",
+	links: [],
+	data: defaultQueryGroupKind(),
+	vizConfig: defaultVizConfigKind(),
+});
+
 export interface GridLayoutItemSpec {
 	x: number;
 	y: number;
@@ -742,32 +636,126 @@ export const defaultGridLayoutSpec = (): GridLayoutSpec => ({
 	items: [],
 });
 
-export interface GridLayoutKind {
-	kind: "GridLayout";
-	spec: GridLayoutSpec;
+export interface QueryOptionsSpec {
+	timeFrom?: string;
+	maxDataPoints?: number;
+	timeShift?: string;
+	queryCachingTTL?: number;
+	interval?: string;
+	cacheTimeout?: string;
 }
 
-export const defaultGridLayoutKind = (): GridLayoutKind => ({
-	kind: "GridLayout",
-	spec: defaultGridLayoutSpec(),
+export const defaultQueryOptionsSpec = (): QueryOptionsSpec => ({
 });
 
-export interface PanelSpec {
-	uid: string;
-	title: string;
-	description: string;
-	links: DashboardLink[];
-	data: QueryGroupKind;
-	vizConfig: VizConfigKind;
+export interface DataQueryKind {
+	kind: string;
+	spec: Record<string, any>;
 }
 
-export const defaultPanelSpec = (): PanelSpec => ({
-	uid: "",
-	title: "",
-	description: "",
-	links: [],
-	data: defaultQueryGroupKind(),
-	vizConfig: defaultVizConfigKind(),
+export const defaultDataQueryKind = (): DataQueryKind => ({
+	kind: "",
+	spec: {},
+});
+
+export interface PanelQuerySpec {
+	query: DataQueryKind;
+	datasource: DataSourceRef;
+	refId: string;
+	hidden: boolean;
+}
+
+export const defaultPanelQuerySpec = (): PanelQuerySpec => ({
+	query: defaultDataQueryKind(),
+	datasource: defaultDataSourceRef(),
+	refId: "",
+	hidden: false,
+});
+
+export interface PanelQueryKind {
+	kind: "PanelQuery";
+	spec: PanelQuerySpec;
+}
+
+export const defaultPanelQueryKind = (): PanelQueryKind => ({
+	kind: "PanelQuery",
+	spec: defaultPanelQuerySpec(),
+});
+
+// Transformations allow to manipulate data returned by a query before the system applies a visualization.
+// Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
+// use the output of one transformation as the input to another transformation, etc.
+export interface DataTransformerConfig {
+	// Unique identifier of transformer
+	id: string;
+	// Disabled transformations are skipped
+	disabled?: boolean;
+	// Optional frame matcher. When missing it will be applied to all results
+	filter?: MatcherConfig;
+	// Where to pull DataFrames from as input to transformation
+	// replaced with DataTopic
+	topic?: "series" | "annotations" | "alertStates";
+	// Options to be passed to the transformer
+	// Valid options depend on the transformer id
+	options: any;
+}
+
+export const defaultDataTransformerConfig = (): DataTransformerConfig => ({
+	id: "",
+	options: {},
+});
+
+export interface TransformationKind {
+	kind: string;
+	spec: DataTransformerConfig;
+}
+
+export const defaultTransformationKind = (): TransformationKind => ({
+	kind: "",
+	spec: defaultDataTransformerConfig(),
+});
+
+export interface QueryGroupSpec {
+	queries: PanelQueryKind[];
+	transformations: TransformationKind[];
+	queryOptions: QueryOptionsSpec;
+}
+
+export const defaultQueryGroupSpec = (): QueryGroupSpec => ({
+	queries: [],
+	transformations: [],
+	queryOptions: defaultQueryOptionsSpec(),
+});
+
+export type QueryVariableSpec = any;
+
+export const defaultQueryVariableSpec = (): QueryVariableSpec => ({});
+
+export interface QueryVariableKind {
+	kind: "QueryVariable";
+	spec: QueryVariableSpec;
+}
+
+export const defaultQueryVariableKind = (): QueryVariableKind => ({
+	kind: "QueryVariable",
+	spec: defaultQueryVariableSpec(),
+});
+
+export type TextVariableSpec = any;
+
+export const defaultTextVariableSpec = (): TextVariableSpec => ({});
+
+// Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
+// It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
+export interface MatcherConfig {
+	// The matcher id. This is used to find the matcher implementation from registry.
+	id: string;
+	// The matcher options. This is specific to the matcher implementation.
+	options?: any;
+}
+
+export const defaultMatcherConfig = (): MatcherConfig => ({
+	id: "",
 });
 
 export interface PanelKind {
@@ -780,21 +768,33 @@ export const defaultPanelKind = (): PanelKind => ({
 	spec: defaultPanelSpec(),
 });
 
-export interface ElementReferenceKind {
-	kind: "ElementReference";
-	spec: ElementReferenceSpec;
+export interface GridLayoutKind {
+	kind: "GridLayout";
+	spec: GridLayoutSpec;
 }
 
-export const defaultElementReferenceKind = (): ElementReferenceKind => ({
-	kind: "ElementReference",
-	spec: defaultElementReferenceSpec(),
+export const defaultGridLayoutKind = (): GridLayoutKind => ({
+	kind: "GridLayout",
+	spec: defaultGridLayoutSpec(),
 });
 
-export interface ElementReferenceSpec {
-	name: string;
+export interface QueryGroupKind {
+	kind: "QueryGroup";
+	spec: QueryGroupSpec;
 }
 
-export const defaultElementReferenceSpec = (): ElementReferenceSpec => ({
-	name: "",
+export const defaultQueryGroupKind = (): QueryGroupKind => ({
+	kind: "QueryGroup",
+	spec: defaultQueryGroupSpec(),
+});
+
+export interface TextVariableKind {
+	kind: "TextVariable";
+	spec: TextVariableSpec;
+}
+
+export const defaultTextVariableKind = (): TextVariableKind => ({
+	kind: "TextVariable",
+	spec: defaultTextVariableSpec(),
 });
 

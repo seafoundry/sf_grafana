@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	cuelang.org/go v0.8.2
-	github.com/grafana/cog v0.0.0-20241029201114-f7f7db0c1070
+	github.com/grafana/cog v0.0.2-0.20241101123801-8d8135cb0c68
 )
 
 require (

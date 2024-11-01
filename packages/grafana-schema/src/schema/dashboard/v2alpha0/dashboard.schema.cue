@@ -1,3 +1,5 @@
+package v2alpha0
+
 DashboardV2: {
   kind: "Dashboard"
   spec: DashboardSpec
@@ -91,31 +93,6 @@ DashboardLink: {
   keepTime: bool | *false
 }
 
-DataSourceRef: {
-  // The plugin type-id
-  type?: string
-
-  // Specific datasource instance
-  uid?: string
-}
-
-// Transformations allow to manipulate data returned by a query before the system applies a visualization.
-// Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
-// use the output of one transformation as the input to another transformation, etc.
-DataTransformerConfig: {
-  // Unique identifier of transformer
-  id: string
-  // Disabled transformations are skipped
-  disabled?: bool
-  // Optional frame matcher. When missing it will be applied to all results
-  filter?: MatcherConfig
-  // Where to pull DataFrames from as input to transformation
-  topic?: "series" | "annotations" | "alertStates" // replaced with common.DataTopic
-  // Options to be passed to the transformer
-  // Valid options depend on the transformer id
-  options: _
-}
-
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
@@ -202,15 +179,6 @@ FieldConfig: {
 DynamicConfigValue: {
   id: string | *""
   value?: _
-}
-
-// Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
-// It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
-MatcherConfig: {
-  // The matcher id. This is used to find the matcher implementation from registry.
-  id: string | *""
-  // The matcher options. This is specific to the matcher implementation.
-  options?: _
 }
 
 Threshold: {
@@ -334,13 +302,6 @@ FieldColor: {
 // Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
 DashboardLinkType: "link" | "dashboards"
 
-// --- Common types ---
-Kind: {
-    kind: string,
-    spec: _
-    metadata?: _
-}
-
 // --- Kinds ---
 VizConfigSpec: {
   pluginVersion: string
@@ -372,61 +333,6 @@ AnnotationQueryKind: {
   spec: AnnotationQuerySpec
 }
 
-QueryOptionsSpec: {
-  timeFrom?: string
-  maxDataPoints?: int
-  timeShift?: string
-  queryCachingTTL?: int
-  interval?: string
-  cacheTimeout?: string
-}
-
-DataQueryKind: {
-  kind: string
-  spec: [string]: _
-}
-
-PanelQuerySpec: {
-  query: DataQueryKind
-  datasource: DataSourceRef
-
-  refId: string
-  hidden: bool
-}
-
-PanelQueryKind: {
-  kind: "PanelQuery"
-  spec: PanelQuerySpec
-}
-
-TransformationKind: {
-  kind: string
-  spec: DataTransformerConfig
-}
-
-QueryGroupSpec: {
-  queries: [...PanelQueryKind]
-  transformations: [...TransformationKind]
-  queryOptions: QueryOptionsSpec
-}
-
-QueryGroupKind: {
-  kind: "QueryGroup"
-  spec: QueryGroupSpec
-}
-
-QueryVariableSpec: {}
-QueryVariableKind: {
-  kind: "QueryVariable"
-  spec: QueryVariableSpec
-}
-
-TextVariableSpec: {}
-TextVariableKind: {
-  kind: "TextVariable"
-  spec: TextVariableSpec
-}
-
 // Time configuration
 // It defines the default time config for the time picker, the refresh picker for the specific dashboard.
 TimeSettingsSpec: {
@@ -454,28 +360,6 @@ TimeSettingsSpec: {
   nowDelay?: string // v1: timepicker.nowDelay
 }
 
-GridLayoutItemSpec: {
-  x: int
-  y: int
-  width: int
-  height: int
-  element: ElementReferenceKind // reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
-}
-
-GridLayoutItemKind: {
-  kind: "GridLayoutItem"
-  spec: GridLayoutItemSpec
-}
-
-GridLayoutSpec: {
-  items: [...GridLayoutItemKind]
-}
-
-GridLayoutKind: {
-  kind: "GridLayout"
-  spec: GridLayoutSpec
-}
-
 PanelSpec: {
   uid: string
   title: string
@@ -488,13 +372,4 @@ PanelSpec: {
 PanelKind: {
   kind: "Panel"
   spec: PanelSpec
-}
-
-ElementReferenceKind: {
-  kind: "ElementReference"
-  spec: ElementReferenceSpec
-}
-
-ElementReferenceSpec: {
-  name: string
 }
