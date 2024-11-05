@@ -536,7 +536,7 @@ func (s *server) Delete(ctx context.Context, req *DeleteRequest) (*DeleteRespons
 		Resource:  req.Key.Resource,
 		Namespace: req.Key.Namespace,
 		Name:      req.Key.Name,
-		// Folder?????
+		Folder:    latest.Folder,
 	})
 	if err != nil {
 		rsp.Error = AsErrorResult(err)
@@ -621,12 +621,10 @@ func (s *server) Read(ctx context.Context, req *ReadRequest) (*ReadResponse, err
 		Resource:  req.Key.Resource,
 		Namespace: req.Key.Namespace,
 		Name:      req.Key.Name,
-		// Folder: ????, or wait until we know the folder???
+		Folder:    rsp.Folder,
 	})
 	if err != nil {
-		rsp.Value = nil // no partial result
-		rsp.Error = AsErrorResult(err)
-		return rsp, nil
+		return &ReadResponse{Error: AsErrorResult(err)}, nil
 	}
 	if !a.Allowed {
 		return &ReadResponse{
@@ -690,14 +688,8 @@ func (s *server) List(ctx context.Context, req *ListRequest) (*ListResponse, err
 				Value:           iter.Value(),
 			}
 
-			if false {
-				// TODO -- we can either parse the values, or hold them in the wrapper
-				namespace := "TODO, read from value"
-				name := "TODO, read from value"
-				folder := "TODO, read from value"
-				if !checker(namespace, name, folder) {
-					continue
-				}
+			if !checker(iter.Namespace(), iter.Name(), iter.Folder()) {
+				continue
 			}
 
 			pageBytes += len(item.Value)
@@ -848,9 +840,9 @@ func (s *server) Watch(req *WatchRequest, srv ResourceStore_WatchServer) error {
 			}
 			s.log.Debug("Server Broadcasting", "type", event.Type, "rv", event.ResourceVersion, "previousRV", event.PreviousRV, "group", event.Key.Group, "namespace", event.Key.Namespace, "resource", event.Key.Resource, "name", event.Key.Name)
 			if event.ResourceVersion > since && matchesQueryKey(req.Options.Key, event.Key) {
-				// if checker() {
-				// 	...
-				// }
+				if checker(event.Key.Namespace, event.Key.Name, event.Folder) {
+					continue
+				}
 
 				value := event.Value
 				// remove the delete marker stored in the value for deleted objects
