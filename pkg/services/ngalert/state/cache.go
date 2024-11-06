@@ -179,6 +179,14 @@ func (c *cache) create(ctx context.Context, log log.Logger, alertRule *ngModels.
 		newState.EndsAt = existingState.EndsAt
 		newState.ResolvedAt = existingState.ResolvedAt
 		newState.LastSentAt = existingState.LastSentAt
+		if existingState.State == eval.Error {
+			if v, ok := existingState.Labels["datasource_uid"]; ok {
+				newState.Labels["datasource_uid"] = v
+			}
+			if v, ok := existingState.Labels["ref_id"]; ok {
+				newState.Labels["ref_id"] = v
+			}
+		}
 	}
 
 	return &newState
