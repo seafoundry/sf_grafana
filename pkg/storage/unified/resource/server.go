@@ -321,7 +321,6 @@ func (s *server) newEvent(ctx context.Context, user claims.AuthInfo, key *Resour
 		Group:     key.Group,
 		Resource:  key.Resource,
 		Namespace: key.Namespace,
-		Name:      key.Name,
 	}
 
 	event := &WriteEvent{
@@ -378,6 +377,7 @@ func (s *server) newEvent(ctx context.Context, user claims.AuthInfo, key *Resour
 	}
 
 	check.Folder = obj.GetFolder()
+	check.Name = key.Name
 	a, err := s.access.Check(ctx, user, check)
 	if err != nil {
 		return nil, AsErrorResult(err)
