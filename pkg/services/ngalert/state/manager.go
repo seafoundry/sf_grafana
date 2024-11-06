@@ -512,10 +512,8 @@ func (st *Manager) setNextState(ctx context.Context, alertRule *ngModels.AlertRu
 		}
 	}
 
-	if extraAnnotations != nil {
-		for key, val := range extraAnnotations {
-			currentState.Annotations[key] = val
-		}
+	for key, val := range extraAnnotations {
+		currentState.Annotations[key] = val
 	}
 
 	st.cache.set(currentState) // replace the existing state with the new one
