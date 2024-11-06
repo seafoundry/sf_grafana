@@ -840,7 +840,7 @@ func (s *server) Watch(req *WatchRequest, srv ResourceStore_WatchServer) error {
 			}
 			s.log.Debug("Server Broadcasting", "type", event.Type, "rv", event.ResourceVersion, "previousRV", event.PreviousRV, "group", event.Key.Group, "namespace", event.Key.Namespace, "resource", event.Key.Resource, "name", event.Key.Name)
 			if event.ResourceVersion > since && matchesQueryKey(req.Options.Key, event.Key) {
-				if checker(event.Key.Namespace, event.Key.Name, event.Folder) {
+				if !checker(event.Key.Namespace, event.Key.Name, event.Folder) {
 					continue
 				}
 
