@@ -74,11 +74,11 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
         errors.addInvalidLinkPathError();
       }
 
-      if (metaValidator.addedLinkNotDefined(config)) {
+      if (metaValidator.isAddedLinkMetaMissing(config)) {
         errors.addMissingExtensionMetaError();
       }
 
-      if (metaValidator.addedLinkTargetsNotDefined(config)) {
+      if (metaValidator.isAddedLinkTargetsNotMatching(config)) {
         errors.addInvalidExtensionTargetsError();
       }
 

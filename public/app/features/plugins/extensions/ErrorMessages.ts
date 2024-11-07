@@ -45,7 +45,7 @@ abstract class ExtensionsErrorMessages extends ErrorMessages {
   }
 
   getLogMessage() {
-    return `Could not register ${this.typeFriendlyName.toLocaleLowerCase()} extension. Reasons: \n${this.errors.join('\n')}`;
+    return `Could not register ${this.typeFriendlyName.toLocaleLowerCase()} extension. Reason${this.errors.length > 1 ? 's' : ''}: \n${this.errors.join('\n')}`;
   }
 }
 
@@ -90,7 +90,7 @@ export class ExposedComponentErrorMessages extends ExtensionsErrorMessages {
 
   addMissingDependencyInfoError() {
     this.errors.push(
-      'The exposed component is not declared in the "plugin.json" file. Exposed components must be listed in the dependencies[] section.'
+      'The exposed component is not recorded in the "plugin.json" file. Exposed components must be listed in the dependencies[] section.'
     );
   }
 }
@@ -106,7 +106,7 @@ export class ExtensionPointErrorMessages extends ErrorMessages {
 
   addMissingMetaInfoError() {
     this.errors.push(
-      'The extension point is not declared in the "plugin.json" file. Extension points must be listed in the section "extensions.extensionPoints[]". Returning an empty array of extensions.'
+      'The extension point is not recorded in the "plugin.json" file. Extension points must be listed in the section "extensions.extensionPoints[]". Returning an empty array of extensions.'
     );
   }
 
@@ -115,6 +115,6 @@ export class ExtensionPointErrorMessages extends ErrorMessages {
   }
 
   getLogMessage() {
-    return `Could not use extension point. Reasons: \n${this.errors.join('\n')}`;
+    return `Could not use extension point. Reason${this.errors.length > 1 ? 's' : ''}: \n${this.errors.join('\n')}`;
   }
 }

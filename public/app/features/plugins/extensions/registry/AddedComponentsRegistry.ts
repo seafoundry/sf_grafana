@@ -52,11 +52,11 @@ export class AddedComponentsRegistry extends Registry<
         errors.addDescriptionMissingError();
       }
 
-      if (metaValidator.addedComponentMetaNotDefined(config)) {
+      if (metaValidator.isAddedComponentMetaMissing(config)) {
         errors.addMissingExtensionMetaError();
       }
 
-      if (metaValidator.addedComponentTargetsNotDefined(config)) {
+      if (metaValidator.isAddedComponentTargetsNotMatching(config)) {
         errors.addInvalidExtensionTargetsError();
       }
 

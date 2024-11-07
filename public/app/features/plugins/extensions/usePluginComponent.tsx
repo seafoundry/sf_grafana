@@ -37,7 +37,7 @@ export function usePluginComponent<Props extends object = {}>(id: string): UsePl
     const validator = new ExtensionPointValidator(registryItem.pluginId, pluginContext);
     const errors = new ExposedComponentErrorMessages(registryItem.pluginId);
 
-    if (validator.exposedComponentDependencyMissing(id)) {
+    if (validator.isExposedComponentDependencyMissing(id)) {
       errors.addMissingDependencyInfoError();
       componentLog.error(
         `Invalid usage of exposed component. Reason: The exposed component is not declared in the "plugin.json" file. Exposed components must be listed in the dependencies[] section.`

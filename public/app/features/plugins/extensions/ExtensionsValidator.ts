@@ -43,7 +43,7 @@ export class ExtensionPointValidator extends Validator {
     return this.enableRestrictions && (!extensionPoints || !extensionPoints.some((ep) => ep.id === extensionPointId));
   }
 
-  exposedComponentDependencyMissing(id: string): boolean {
+  isExposedComponentDependencyMissing(id: string): boolean {
     const exposedComponentsDependencies = this.pluginContext?.meta?.dependencies?.extensions?.exposedComponents;
     return this.enableRestrictions && (!exposedComponentsDependencies || !exposedComponentsDependencies.includes(id));
   }
@@ -56,38 +56,38 @@ export class ExtensionsValidator extends Validator {
     this.enableRestrictions = isGrafanaDevMode() && this.pluginId !== 'grafana';
   }
 
-  addedComponentMetaNotDefined(extension: PluginExtensionAddedComponentConfig): boolean {
+  isAddedComponentMetaMissing(extension: PluginExtensionAddedComponentConfig): boolean {
     return (
       this.enableRestrictions &&
       !!!this.config?.extensions.addedComponents.some(({ title }) => title === extension.title)
     );
   }
 
-  addedComponentTargetsNotDefined(extension: PluginExtensionAddedLinkConfig): boolean {
+  isAddedComponentTargetsNotMatching(extension: PluginExtensionAddedLinkConfig): boolean {
     const pluginJsonMeta = this.config?.extensions.addedComponents.find(({ title }) => title === extension.title);
     const targets = Array.isArray(extension.targets) ? extension.targets : [extension.targets];
     return this.enableRestrictions && !targets.every((target) => pluginJsonMeta?.targets.includes(target));
   }
 
-  exposedComponentNotDefined(extension: PluginExtensionExposedComponentConfig): boolean {
+  isExposedComponentMetaMissing(extension: PluginExtensionExposedComponentConfig): boolean {
     return (
       this.enableRestrictions &&
       !!!this.config?.extensions.exposedComponents.some(({ title }) => title === extension.title)
     );
   }
 
-  exposedComponentTitlesNotMatching(extension: PluginExtensionExposedComponentConfig): boolean {
+  isExposedComponentTitlesNotMatching(extension: PluginExtensionExposedComponentConfig): boolean {
     const pluginJsonMeta = this.config?.extensions.exposedComponents.find(({ title }) => title === extension.title);
     return this.enableRestrictions && pluginJsonMeta?.title !== extension.title;
   }
 
-  addedLinkNotDefined(extension: PluginExtensionAddedLinkConfig): boolean {
+  isAddedLinkMetaMissing(extension: PluginExtensionAddedLinkConfig): boolean {
     return (
       this.enableRestrictions && !!!this.config?.extensions.addedLinks.some(({ title }) => title === extension.title)
     );
   }
 
-  addedLinkTargetsNotDefined(extension: PluginExtensionAddedLinkConfig): boolean {
+  isAddedLinkTargetsNotMatching(extension: PluginExtensionAddedLinkConfig): boolean {
     const pluginJsonMeta = this.config?.extensions.addedLinks.find(({ title }) => title === extension.title);
     const targets = Array.isArray(extension.targets) ? extension.targets : [extension.targets];
     return this.enableRestrictions && !targets.every((target) => pluginJsonMeta?.targets.includes(target));

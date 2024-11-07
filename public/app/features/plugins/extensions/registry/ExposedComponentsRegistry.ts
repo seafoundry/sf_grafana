@@ -69,11 +69,11 @@ export class ExposedComponentsRegistry extends Registry<
         errors.addDescriptionMissingError();
       }
 
-      if (metaValidator.exposedComponentNotDefined(config)) {
+      if (metaValidator.isExposedComponentMetaMissing(config)) {
         errors.addMissingExtensionMetaError();
       }
 
-      if (metaValidator.exposedComponentTitlesNotMatching(config)) {
+      if (metaValidator.isExposedComponentTitlesNotMatching(config)) {
         errors.addTitleMismatchError();
       }
 
