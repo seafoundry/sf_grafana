@@ -221,6 +221,9 @@ func SetDualWritingMode(
 		return desiredMode, nil
 	case desiredMode == Mode4 && currentMode == Mode3:
 	case desiredMode == Mode5 && currentMode == Mode4:
+	case desiredMode == Mode3 && currentMode == Mode4:
+	case desiredMode == Mode3 && currentMode == Mode5:
+	case desiredMode == Mode4 && currentMode == Mode5:
 		currentMode = desiredMode
 		err := kvs.Set(ctx, entity, fmt.Sprint(currentMode))
 		if err != nil {
