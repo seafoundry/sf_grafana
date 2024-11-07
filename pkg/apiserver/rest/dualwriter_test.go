@@ -19,6 +19,7 @@ func TestSetDualWritingMode(t *testing.T) {
 		kvStore      *fakeNamespacedKV
 		desiredMode  DualWriterMode
 		expectedMode DualWriterMode
+		wantErr      bool
 	}
 	tests :=
 		[]testCase{
@@ -35,8 +36,8 @@ func TestSetDualWritingMode(t *testing.T) {
 				expectedMode: Mode1,
 			},
 			{
-				name:         "should return mode 3 as desired mode when current mode is > 3",
-				kvStore:      &fakeNamespacedKV{data: map[string]string{"playlist.grafana.app/playlists": "5"}, namespace: "storage.dualwriting"},
+				name:         "should return mode 3 as desired mode when current mode is 4",
+				kvStore:      &fakeNamespacedKV{data: map[string]string{"playlist.grafana.app/playlists": "4"}, namespace: "storage.dualwriting"},
 				desiredMode:  Mode3,
 				expectedMode: Mode3,
 			},
@@ -52,6 +53,13 @@ func TestSetDualWritingMode(t *testing.T) {
 				desiredMode:  Mode0,
 				expectedMode: Mode0,
 			},
+			{
+				name:         "should not allow for hopping modes on upgrades",
+				kvStore:      &fakeNamespacedKV{data: map[string]string{"playlist.grafana.app/playlists": "2"}, namespace: "storage.dualwriting"},
+				desiredMode:  Mode4,
+				expectedMode: Mode2,
+				wantErr:      true,
+			},
 		}
 
 	for _, tt := range tests {
@@ -66,6 +74,10 @@ func TestSetDualWritingMode(t *testing.T) {
 		us := storageMock{m, s}
 
 		dwMode, err := SetDualWritingMode(context.Background(), tt.kvStore, ls, us, "playlist.grafana.app/playlists", tt.desiredMode, p, &fakeServerLock{}, &request.RequestInfo{})
+		if tt.wantErr {
+			assert.Error(t, err)
+			continue
+		}
 		assert.NoError(t, err)
 		assert.Equal(t, tt.expectedMode, dwMode)
 	}

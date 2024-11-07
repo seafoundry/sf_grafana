@@ -219,17 +219,18 @@ func SetDualWritingMode(
 			return currentMode, errDualWriterSetCurrentMode
 		}
 		return desiredMode, nil
-	case desiredMode == Mode4 && currentMode == Mode3:
-	case desiredMode == Mode5 && currentMode == Mode4:
-	case desiredMode == Mode3 && currentMode == Mode4:
-	case desiredMode == Mode3 && currentMode == Mode5:
-	case desiredMode == Mode4 && currentMode == Mode5:
+
+	case desiredMode == Mode4 && currentMode == Mode3,
+		desiredMode == Mode5 && currentMode == Mode4,
+		desiredMode == Mode3 && currentMode == Mode4,
+		desiredMode == Mode3 && currentMode == Mode5,
+		desiredMode == Mode4 && currentMode == Mode5:
 		currentMode = desiredMode
 		err := kvs.Set(ctx, entity, fmt.Sprint(currentMode))
 		if err != nil {
 			return currentMode, errDualWriterSetCurrentMode
 		}
-	case desiredMode - currentMode > 1:
+	case desiredMode-currentMode > 1:
 		return currentMode, errors.New("cannot upgrade more than one mode")
 	default:
 		return Mode0, errDualWriterSetCurrentMode
