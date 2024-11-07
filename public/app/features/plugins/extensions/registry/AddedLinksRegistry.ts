@@ -3,7 +3,7 @@ import { ReplaySubject } from 'rxjs';
 import { IconName, PluginExtensionAddedLinkConfig } from '@grafana/data';
 import { PluginAddedLinksConfigureFunc, PluginExtensionEventHelpers } from '@grafana/data/src/types/pluginExtensions';
 
-import { AddedLinkErrorMessages } from '../ExtensionsErrorMessages';
+import { AddedLinkErrorMessages } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
 import {
   extensionPointEndsWithVersion,

@@ -8,8 +8,8 @@ import {
   UsePluginLinksResult,
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
+import { ExtensionPointErrorMessages } from './ErrorMessages';
 import { useAddedLinksRegistry } from './ExtensionRegistriesContext';
-import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
 import {
@@ -41,7 +41,7 @@ export function usePluginLinks({
     });
 
     if (validator.isExtensionPointIdInvalid(extensionPointId)) {
-      errors.addInvalidIdError(extensionPointId);
+      errors.addInvalidIdError();
     }
 
     if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {

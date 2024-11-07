@@ -4,7 +4,7 @@ import { useObservable } from 'react-use';
 import { PluginExtension, usePluginContext } from '@grafana/data';
 import { GetPluginExtensionsOptions, UsePluginExtensionsResult } from '@grafana/runtime';
 
-import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
+import { ExtensionPointErrorMessages } from './ErrorMessages';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { getPluginExtensions } from './getPluginExtensions';
 import { log } from './logs/log';

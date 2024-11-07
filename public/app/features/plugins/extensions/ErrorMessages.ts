@@ -1,9 +1,3 @@
-export enum ExtensionsType {
-  AddedComponents = 'addedComponents',
-  AddedLinks = 'addedLinks',
-  ExposedComponents = 'exposedComponents',
-}
-
 export abstract class ErrorMessages {
   protected errors: string[];
   constructor(protected pluginId: string) {
@@ -13,6 +7,8 @@ export abstract class ErrorMessages {
   get hasErrors() {
     return this.errors.length > 0;
   }
+
+  abstract getLogMessage(): string;
 }
 
 abstract class ExtensionsErrorMessages extends ErrorMessages {
@@ -26,18 +22,18 @@ abstract class ExtensionsErrorMessages extends ErrorMessages {
 
   addMissingExtensionMetaError() {
     this.errors.push(
-      `The extension was not declared in the plugin.json of "${this.pluginId}". ${this.typeFriendlyName} extensions must be listed in the section "${this.sectionName}".`
+      `The extension was not recorded in the plugin.json. ${this.typeFriendlyName} extensions must be listed in the section "${this.sectionName}".`
     );
   }
 
   addTitleMismatchError() {
-    this.errors.push(
-      `The title of the ${this.typeFriendlyName} does not match the title specified in the plugin.json file.`
-    );
+    this.errors.push(`The title of the ${this.typeFriendlyName} does not match the title specified in plugin.json.`);
   }
 
   addInvalidExtensionTargetsError() {
-    this.errors.push('The "targets" property is missing in the component configuration.');
+    this.errors.push(
+      `The registered extension point targets does not match the targets listed in the section "${this.sectionName}" of the plugin.json file.`
+    );
   }
 
   addTitleMissingError() {
@@ -56,10 +52,6 @@ abstract class ExtensionsErrorMessages extends ErrorMessages {
 export class AddedLinkErrorMessages extends ExtensionsErrorMessages {
   constructor(pluginId: string) {
     super(pluginId, 'Added link', 'extensions.addedLinks[]');
-  }
-
-  addInvalidExtensionTargetsError() {
-    this.errors.push('The "targets" property is missing in the link configuration.');
   }
 
   addInvalidConfigureFnError() {
@@ -109,20 +101,20 @@ export class ExtensionPointErrorMessages extends ErrorMessages {
   }
 
   get InvalidIdError() {
-    return `Extension point id should be prefixed with your plugin id, e.g "${this.pluginId}/{extensionPointId}".`;
+    return `Extension point id should be prefixed with your plugin id, e.g "myorg-foo-app/toolbar/v1".`;
   }
 
   addMissingMetaInfoError() {
     this.errors.push(
-      'Invalid extension point. Reason: The extension point is not declared in the "plugin.json" file. Extension points must be listed in the section "extensions.extensionPoints[]". Returning an empty array of extensions.'
+      'The extension point is not declared in the "plugin.json" file. Extension points must be listed in the section "extensions.extensionPoints[]". Returning an empty array of extensions.'
     );
   }
 
-  addInvalidIdError(extensionPointId: string) {
+  addInvalidIdError() {
     this.errors.push(this.InvalidIdError);
   }
 
   getLogMessage() {
-    return `Could not register extension point. Reasons: \n${this.errors.join('\n')}`;
+    return `Could not use extension point. Reasons: \n${this.errors.join('\n')}`;
   }
 }

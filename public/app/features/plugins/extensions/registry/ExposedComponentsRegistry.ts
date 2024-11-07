@@ -2,7 +2,7 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionExposedComponentConfig } from '@grafana/data';
 
-import { ExposedComponentErrorMessages } from '../ExtensionsErrorMessages';
+import { ExposedComponentErrorMessages } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
 import { extensionPointEndsWithVersion } from '../validators';
 

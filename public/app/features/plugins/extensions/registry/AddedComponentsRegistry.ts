@@ -2,7 +2,7 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionAddedComponentConfig } from '@grafana/data';
 
-import { AddedComponentErrorMessages } from '../ExtensionsErrorMessages';
+import { AddedComponentErrorMessages } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
 import { wrapWithPluginContext } from '../utils';
 import { extensionPointEndsWithVersion, isGrafanaCoreExtensionPoint } from '../validators';

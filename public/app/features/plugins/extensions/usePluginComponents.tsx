@@ -7,8 +7,8 @@ import {
   UsePluginComponentsResult,
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
+import { ExtensionPointErrorMessages } from './ErrorMessages';
 import { useAddedComponentsRegistry } from './ExtensionRegistriesContext';
-import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
 
@@ -34,7 +34,7 @@ export function usePluginComponents<Props extends object = {}>({
     });
 
     if (validator.isExtensionPointIdInvalid(extensionPointId)) {
-      errors.addInvalidIdError(extensionPointId);
+      errors.addInvalidIdError();
     }
 
     if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
