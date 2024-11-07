@@ -9,20 +9,16 @@ import {
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
 import { useAddedLinksRegistry } from './ExtensionRegistriesContext';
-import { ExtensionsErrorMessages, ExtensionsType } from './ExtensionsErrorMessages';
-import { ExtensionsValidator } from './ExtensionsValidator';
-import { INVALID_EXTENSION_POINT_ID, MISSING_EXTENSION_POINT_META_INFO } from './errors';
+import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
+import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
-import { isExtensionPointMetaInfoMissing } from './metaValidators';
 import {
   generateExtensionId,
   getLinkExtensionOnClick,
   getLinkExtensionOverrides,
   getLinkExtensionPathWithTracking,
   getReadOnlyProxy,
-  isGrafanaDevMode,
 } from './utils';
-import { isExtensionPointIdValid } from './validators';
 
 // Returns an array of component extensions for the given extension point
 export function usePluginLinks({
@@ -37,24 +33,23 @@ export function usePluginLinks({
   return useMemo(() => {
     // For backwards compatibility we don't enable restrictions in production or when the hook is used in core Grafana.
     const pluginId = pluginContext?.meta.id ?? '';
-    const validator = new ExtensionsValidator(pluginId, pluginContext !== null);
-    const errors = new ExtensionsErrorMessages(ExtensionsType.AddedLinks, pluginId);
+    const validator = new ExtensionPointValidator(pluginId, pluginContext);
+    const errors = new ExtensionPointErrorMessages(pluginId);
     const pointLog = log.child({
       pluginId,
       extensionPointId,
     });
 
     if (validator.isExtensionPointIdInvalid(extensionPointId)) {
-      errors.addInvalidExtensionPointIdError(extensionPointId);
-      // pointLog.error(INVALID_EXTENSION_POINT_ID(pluginId, extensionPointId));
-      // return {
-      //   isLoading: false,
-      //   links: [],
-      // };
+      errors.addInvalidIdError(extensionPointId);
     }
 
-    if (validator.isExtensionPointMetaInfoMissing(extensionPointId, pluginContext)) {
-      pointLog.error(MISSING_EXTENSION_POINT_META_INFO);
+    if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
+      errors.addMissingMetaInfoError();
+    }
+
+    if (errors.hasErrors) {
+      pointLog.error(errors.getLogMessage());
       return {
         isLoading: false,
         links: [],
@@ -76,6 +71,7 @@ export function usePluginLinks({
       const { pluginId } = addedLink;
       // Only limit if the `limitPerPlugin` is set
       if (limitPerPlugin && extensionsByPlugin[pluginId] >= limitPerPlugin) {
+        pointLog.debug(`The limit of ${limitPerPlugin} links per plugin has been reached. Skipping the rest.`);
         continue;
       }
 

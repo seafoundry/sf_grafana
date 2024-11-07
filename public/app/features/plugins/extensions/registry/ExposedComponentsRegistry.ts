@@ -2,9 +2,8 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionExposedComponentConfig } from '@grafana/data';
 
-import { ExtensionsErrorMessages, ExtensionsType } from '../ExtensionsErrorMessages';
+import { ExposedComponentErrorMessages } from '../ExtensionsErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
-import { isExposedComponentMetaInfoMissing, isGrafanaDevMode } from '../utils';
 import { extensionPointEndsWithVersion } from '../validators';
 
 import { Registry, RegistryType, PluginExtensionConfigs } from './Registry';
@@ -39,7 +38,7 @@ export class ExposedComponentsRegistry extends Registry<
 
     for (const config of configs) {
       const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new ExtensionsErrorMessages(ExtensionsType.ExposedComponents, pluginId);
+      const errors = new ExposedComponentErrorMessages(pluginId);
       const { id, description, title } = config;
       const pointIdLog = this.logger.child({
         extensionPointId: id,
@@ -49,7 +48,7 @@ export class ExposedComponentsRegistry extends Registry<
       });
 
       if (!id.startsWith(pluginId)) {
-        errors.addInvalidExposedComponentIdError();
+        errors.addInvalidComponentIdError();
       }
 
       if (!extensionPointEndsWithVersion(id)) {
@@ -59,7 +58,7 @@ export class ExposedComponentsRegistry extends Registry<
       }
 
       if (registry[id]) {
-        errors.addExposedComponentAlreadyExistsError();
+        errors.addComponentAlreadyExistsError();
       }
 
       if (!title) {

@@ -2,9 +2,8 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionAddedComponentConfig } from '@grafana/data';
 
-import { ExtensionsErrorMessages, ExtensionsType } from '../ExtensionsErrorMessages';
+import { AddedComponentErrorMessages } from '../ExtensionsErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
-import { DESCRIPTION_MISSING, INVALID_EXTENSION_TARGETS, MISSING_EXTENSION_META, TITLE_MISSING } from '../errors';
 import { wrapWithPluginContext } from '../utils';
 import { extensionPointEndsWithVersion, isGrafanaCoreExtensionPoint } from '../validators';
 
@@ -38,7 +37,7 @@ export class AddedComponentsRegistry extends Registry<
 
     for (const config of configs) {
       const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new ExtensionsErrorMessages(ExtensionsType.AddedComponents, pluginId);
+      const errors = new AddedComponentErrorMessages(pluginId);
       const configLog = this.logger.child({
         description: config.description,
         title: config.title,
@@ -53,7 +52,7 @@ export class AddedComponentsRegistry extends Registry<
         errors.addDescriptionMissingError();
       }
 
-      if (metaValidator.addedComponentNotDefined(config)) {
+      if (metaValidator.addedComponentMetaNotDefined(config)) {
         errors.addMissingExtensionMetaError();
       }
 

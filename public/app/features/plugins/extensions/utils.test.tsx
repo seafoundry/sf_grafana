@@ -24,8 +24,6 @@ import {
   isAddedLinkMetaInfoMissing,
   isAddedComponentMetaInfoMissing,
   isExposedComponentMetaInfoMissing,
-  isExposedComponentDependencyMissing,
-  isExtensionPointMetaInfoMissing,
 } from './utils';
 
 jest.mock('app/features/plugins/pluginSettings', () => ({

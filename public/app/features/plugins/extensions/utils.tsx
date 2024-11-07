@@ -16,7 +16,6 @@ import {
   PanelMenuItem,
   PluginExtensionAddedLinkConfig,
   urlUtil,
-  PluginContextType,
   PluginExtensionExposedComponentConfig,
   PluginExtensionAddedComponentConfig,
 } from '@grafana/data';

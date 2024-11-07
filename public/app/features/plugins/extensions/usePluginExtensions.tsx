@@ -4,13 +4,11 @@ import { useObservable } from 'react-use';
 import { PluginExtension, usePluginContext } from '@grafana/data';
 import { GetPluginExtensionsOptions, UsePluginExtensionsResult } from '@grafana/runtime';
 
-import { INVALID_EXTENSION_POINT_ID, MISSING_EXTENSION_POINT_META_INFO } from './errors';
+import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
+import { ExtensionPointValidator } from './ExtensionsValidator';
 import { getPluginExtensions } from './getPluginExtensions';
 import { log } from './logs/log';
-import { isExtensionPointMetaInfoMissing } from './metaValidators';
 import { PluginExtensionRegistries } from './registry/types';
-import { isGrafanaDevMode } from './utils';
-import { isExtensionPointIdValid } from './validators';
 
 export function createUsePluginExtensions(registries: PluginExtensionRegistries) {
   const observableAddedComponentsRegistry = registries.addedComponentsRegistry.asObservable();
@@ -24,8 +22,10 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
 
     const { extensions } = useMemo(() => {
       // For backwards compatibility we don't enable restrictions in production or when the hook is used in core Grafana.
-      const enableRestrictions = isGrafanaDevMode() && pluginContext !== null;
       const pluginId = pluginContext?.meta.id ?? '';
+
+      const validator = new ExtensionPointValidator(pluginId, pluginContext);
+      const errors = new ExtensionPointErrorMessages(pluginId);
       const pointLog = log.child({
         pluginId,
         extensionPointId,
@@ -35,16 +35,16 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
         return { extensions: [], isLoading: false };
       }
 
-      if (enableRestrictions && !isExtensionPointIdValid({ extensionPointId, pluginId })) {
-        pointLog.error(INVALID_EXTENSION_POINT_ID(pluginId, extensionPointId));
-        return {
-          isLoading: false,
-          extensions: [],
-        };
+      if (validator.isExtensionPointIdInvalid(extensionPointId)) {
+        pointLog.warning(errors.InvalidIdError);
       }
 
-      if (enableRestrictions && isExtensionPointMetaInfoMissing(extensionPointId, pluginContext)) {
-        pointLog.error(MISSING_EXTENSION_POINT_META_INFO);
+      if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
+        errors.addMissingMetaInfoError();
+      }
+
+      if (errors.hasErrors) {
+        pointLog.error(errors.getLogMessage());
         return {
           isLoading: false,
           extensions: [],

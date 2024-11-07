@@ -8,11 +8,9 @@ import {
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
 import { useAddedComponentsRegistry } from './ExtensionRegistriesContext';
-import { INVALID_EXTENSION_POINT_ID, MISSING_EXTENSION_POINT_META_INFO } from './errors';
+import { ExtensionPointErrorMessages } from './ExtensionsErrorMessages';
+import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
-import { isExtensionPointMetaInfoMissing } from './metaValidators';
-import { isGrafanaDevMode } from './utils';
-import { isExtensionPointIdValid } from './validators';
 
 // Returns an array of component extensions for the given extension point
 export function usePluginComponents<Props extends object = {}>({
@@ -25,25 +23,26 @@ export function usePluginComponents<Props extends object = {}>({
 
   return useMemo(() => {
     // For backwards compatibility we don't enable restrictions in production or when the hook is used in core Grafana.
-    const enableRestrictions = isGrafanaDevMode() && pluginContext;
     const components: Array<React.ComponentType<Props>> = [];
     const extensionsByPlugin: Record<string, number> = {};
     const pluginId = pluginContext?.meta.id ?? '';
+    const validator = new ExtensionPointValidator(pluginId, pluginContext);
+    const errors = new ExtensionPointErrorMessages(pluginId);
     const pointLog = log.child({
       pluginId,
       extensionPointId,
     });
 
-    if (enableRestrictions && !isExtensionPointIdValid({ extensionPointId, pluginId })) {
-      pointLog.error(INVALID_EXTENSION_POINT_ID(pluginId, extensionPointId));
-      return {
-        isLoading: false,
-        components: [],
-      };
+    if (validator.isExtensionPointIdInvalid(extensionPointId)) {
+      errors.addInvalidIdError(extensionPointId);
     }
 
-    if (enableRestrictions && isExtensionPointMetaInfoMissing(extensionPointId, pluginContext)) {
-      pointLog.error(MISSING_EXTENSION_POINT_META_INFO);
+    if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
+      errors.addMissingMetaInfoError();
+    }
+
+    if (errors.hasErrors) {
+      pointLog.error(errors.getLogMessage());
       return {
         isLoading: false,
         components: [],

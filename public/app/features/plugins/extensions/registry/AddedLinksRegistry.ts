@@ -3,7 +3,7 @@ import { ReplaySubject } from 'rxjs';
 import { IconName, PluginExtensionAddedLinkConfig } from '@grafana/data';
 import { PluginAddedLinksConfigureFunc, PluginExtensionEventHelpers } from '@grafana/data/src/types/pluginExtensions';
 
-import { ExtensionsErrorMessages, ExtensionsType } from '../ExtensionsErrorMessages';
+import { AddedLinkErrorMessages } from '../ExtensionsErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
 import {
   extensionPointEndsWithVersion,
@@ -44,7 +44,7 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
 
     for (const config of configs) {
       const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new ExtensionsErrorMessages(ExtensionsType.AddedLinks, pluginId);
+      const errors = new AddedLinkErrorMessages(pluginId);
       const { path, title, description, configure, onClick, targets } = config;
       const configLog = this.logger.child({
         path: path ?? '',
