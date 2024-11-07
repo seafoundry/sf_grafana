@@ -203,7 +203,7 @@ func SetDualWritingMode(
 		if err != nil {
 			return Mode0, errDualWriterSetCurrentMode
 		}
-	case desiredMode >= Mode3 && currentMode < Mode3:
+	case desiredMode == Mode3 && currentMode == Mode2:
 		syncOk, err := runDataSyncer(ctx, currentMode, legacy, storage, entity, reg, serverLockService, requestInfo)
 		if err != nil {
 			klog.Info("data syncer failed for mode:", m)
@@ -219,12 +219,15 @@ func SetDualWritingMode(
 			return currentMode, errDualWriterSetCurrentMode
 		}
 		return desiredMode, nil
-	case desiredMode >= Mode3 && currentMode > Mode3:
+	case desiredMode == Mode4 && currentMode == Mode3:
+	case desiredMode == Mode5 && currentMode == Mode4:
 		currentMode = desiredMode
 		err := kvs.Set(ctx, entity, fmt.Sprint(currentMode))
 		if err != nil {
 			return currentMode, errDualWriterSetCurrentMode
 		}
+	case desiredMode - currentMode > 1:
+		return currentMode, errors.New("cannot upgrade more than one mode")
 	default:
 		return Mode0, errDualWriterSetCurrentMode
 	}
