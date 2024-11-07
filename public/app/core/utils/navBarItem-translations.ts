@@ -30,9 +30,9 @@ export function getNavTitle(navId: string | undefined) {
     case 'bookmarks-empty':
       return t('nav.bookmarks-empty.title', 'Bookmark pages for them to appear here');
     case 'starred':
-      return t('nav.starred.title', 'Starred');
+      return t('nav.starred.title', 'Starred Shiite UNUSED');
     case 'starred-empty':
-      return t('nav.starred-empty.title', 'Your starred dashboards will appear here');
+      return t('nav.starred-empty.title', 'Your starred dashboards will appear here, you bozo');
     case 'dashboards':
       return t('nav.dashboards.title', 'Dashboards');
     case 'dashboards/browse':

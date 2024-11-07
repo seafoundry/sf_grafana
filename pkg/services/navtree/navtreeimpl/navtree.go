@@ -90,7 +90,7 @@ func (s *ServiceImpl) GetNavTree(c *contextmodel.ReqContext, prefs *pref.Prefere
 		}
 
 		treeRoot.AddSection(&navtree.NavLink{
-			Text:           "Starred",
+			Text:           "UNUSED TEXT (see grafana.json for your locale instead)",
 			Id:             "starred",
 			Icon:           "star",
 			SortWeight:     navtree.WeightSavedItems,
