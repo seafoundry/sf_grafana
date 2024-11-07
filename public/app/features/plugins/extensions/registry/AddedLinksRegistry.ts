@@ -54,7 +54,7 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
       });
       const enableRestrictions = isGrafanaDevMode() && pluginId !== 'grafana';
       const metaValidator = new ExtensionsValidator(pluginId);
-      const msg = new AddedLinkLogMessage(pluginId);
+      const msg = new AddedLinkLogMessage(configLog, pluginId);
 
       if (!title) {
         msg.addTitleMissingError();
@@ -86,8 +86,6 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
 
       const extensionPointIds = Array.isArray(targets) ? targets : [targets];
       for (const extensionPointId of extensionPointIds) {
-        const pointIdLog = configLog.child({ extensionPointId });
-
         if (!isGrafanaCoreExtensionPoint(extensionPointId) && !extensionPointEndsWithVersion(extensionPointId)) {
           msg.addMissingVersionSuffixWarning();
         }
@@ -99,8 +97,8 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
         }
 
         registry[extensionPointId].push({ ...registryItem, pluginId, extensionPointId });
-        msg.printResult(pointIdLog);
       }
+      msg.print();
     }
 
     return registry;

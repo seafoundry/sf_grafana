@@ -3,23 +3,31 @@ import { ExtensionsLog } from './logs/log';
 export abstract class LogMessageBuilder {
   protected errors: string[];
   protected warnings: string[];
-  constructor(protected pluginId: string) {
+  constructor(
+    protected log: ExtensionsLog,
+    protected pluginId: string
+  ) {
     this.errors = [];
     this.warnings = [];
   }
 
-  abstract printResult(log: ExtensionsLog): void;
+  get HasErrors() {
+    return this.errors.length > 0;
+  }
+
+  abstract print(log: ExtensionsLog): void;
 
   abstract getLogMessage(): string;
 }
 
 abstract class ExtensionsLogMessage extends LogMessageBuilder {
   constructor(
+    protected log: ExtensionsLog,
     protected pluginId: string,
     private typeFriendlyName: string,
     private sectionName: string
   ) {
-    super(pluginId);
+    super(log, pluginId);
   }
 
   addMissingExtensionMetaError() {
@@ -64,28 +72,27 @@ abstract class ExtensionsLogMessage extends LogMessageBuilder {
     this.errors.push('Description is missing.');
   }
 
-  getLogMessage() {
-    return `Could not register ${this.typeFriendlyName.toLocaleLowerCase()} extension. Reason${this.errors.length > 1 ? 's' : ''}: \n${this.errors.join('\n')}`;
-  }
-
-  printResult(log: ExtensionsLog): void {
+  print(): void {
     if (this.errors.length) {
       const line = `Could not register ${this.typeFriendlyName.toLocaleLowerCase()} extension. Errors: \n${this.errors.join('\n')}\n Warnings: \n${this.warnings.join('\n')}`;
       this.warnings.length && line.concat(`\n Warnings: \n${this.warnings.join('\n')}`);
-      log.error(line);
+      this.log.error(line);
     } else if (this.warnings.length) {
-      log.warning(
+      this.log.warning(
         `${this.typeFriendlyName} successfully registered with the following warnings: \n${this.warnings.join('\n')}`
       );
     } else {
-      log.debug(`${this.typeFriendlyName} extension successfully registered.`);
+      this.log.debug(`${this.typeFriendlyName} extension successfully registered.`);
     }
   }
 }
 
 export class AddedLinkLogMessage extends ExtensionsLogMessage {
-  constructor(protected pluginId: string) {
-    super(pluginId, 'Added link', 'extensions.addedLinks[]');
+  constructor(
+    protected log: ExtensionsLog,
+    protected pluginId: string
+  ) {
+    super(log, pluginId, 'Added link', 'extensions.addedLinks[]');
   }
 
   addInvalidConfigureFnError() {
@@ -102,14 +109,20 @@ export class AddedLinkLogMessage extends ExtensionsLogMessage {
 }
 
 export class AddedComponentLogMessage extends ExtensionsLogMessage {
-  constructor(protected pluginId: string) {
-    super(pluginId, 'Added component', 'extensions.addedComponents[]');
+  constructor(
+    protected log: ExtensionsLog,
+    protected pluginId: string
+  ) {
+    super(log, pluginId, 'Added component', 'extensions.addedComponents[]');
   }
 }
 
 export class ExposedComponentLogMessage extends ExtensionsLogMessage {
-  constructor(protected pluginId: string) {
-    super(pluginId, 'Exposed component', 'extensions.exposedComponents[]');
+  constructor(
+    protected log: ExtensionsLog,
+    protected pluginId: string
+  ) {
+    super(log, pluginId, 'Exposed component', 'extensions.exposedComponents[]');
   }
 
   addInvalidComponentIdError() {
@@ -136,16 +149,15 @@ export class ExposedComponentLogMessage extends ExtensionsLogMessage {
 }
 
 export class ExtensionPointLogMessage extends LogMessageBuilder {
-  constructor(protected pluginId: string) {
-    super(pluginId);
+  constructor(
+    protected log: ExtensionsLog,
+    protected pluginId: string
+  ) {
+    super(log, pluginId);
   }
 
   get InvalidIdError() {
     return `Extension point id should be prefixed with your plugin id, e.g "myorg-foo-app/toolbar/v1".`;
-  }
-
-  get HasErrors() {
-    return this.errors.length > 0;
   }
 
   addMissingMetaInfoError() {
@@ -168,11 +180,11 @@ export class ExtensionPointLogMessage extends LogMessageBuilder {
     return `Could not use extension point. Reason${this.errors.length > 1 ? 's' : ''}: \n${this.errors.join('\n')}`;
   }
 
-  printResult(log: ExtensionsLog): void {
+  print(): void {
     if (this.errors.length) {
-      log.error(`Could not use extension point. Reasons: \n${this.errors.join('\n')}`);
+      this.log.error(`Could not use extension point. Reasons: \n${this.errors.join('\n')}`);
     } else if (this.warnings.length) {
-      log.warning(`The extension point has the following warnings: \n${this.warnings.join('\n')}`);
+      this.log.warning(`The extension point has the following warnings: \n${this.warnings.join('\n')}`);
     }
   }
 }

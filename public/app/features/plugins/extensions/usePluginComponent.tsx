@@ -40,7 +40,7 @@ export function usePluginComponent<Props extends object = {}>(id: string): UsePl
 
     if (validator.isExposedComponentDependencyMissing(id)) {
       enableRestrictions ? msg.addMissingDependencyInfoError() : msg.addMissingDependencyInfoWarning();
-      msg.printResult(componentLog);
+      msg.print(componentLog);
       return {
         isLoading: false,
         component: null,

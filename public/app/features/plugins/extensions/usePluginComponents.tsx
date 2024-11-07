@@ -44,7 +44,7 @@ export function usePluginComponents<Props extends object = {}>({
     }
 
     if (msg.HasErrors) {
-      msg.printResult(pointLog);
+      msg.print(pointLog);
       return {
         isLoading: false,
         components: [],

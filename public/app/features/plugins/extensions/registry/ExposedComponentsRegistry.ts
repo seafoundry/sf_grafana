@@ -37,8 +37,6 @@ export class ExposedComponentsRegistry extends Registry<
     }
 
     for (const config of configs) {
-      const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new ExposedComponentLogMessage(pluginId);
       const { id, description, title } = config;
       const pointIdLog = this.logger.child({
         extensionPointId: id,
@@ -46,9 +44,11 @@ export class ExposedComponentsRegistry extends Registry<
         title,
         pluginId,
       });
+      const metaValidator = new ExtensionsValidator(pluginId);
+      const msg = new ExposedComponentLogMessage(pointIdLog, pluginId);
 
       if (!id.startsWith(pluginId)) {
-        errors.addInvalidComponentIdError();
+        msg.addInvalidComponentIdError();
       }
 
       if (!extensionPointEndsWithVersion(id)) {
@@ -58,33 +58,28 @@ export class ExposedComponentsRegistry extends Registry<
       }
 
       if (registry[id]) {
-        errors.addComponentAlreadyExistsError();
+        msg.addComponentAlreadyExistsError();
       }
 
       if (!title) {
-        errors.addTitleMissingError();
+        msg.addTitleMissingError();
       }
 
       if (!description) {
-        errors.addDescriptionMissingError();
+        msg.addDescriptionMissingError();
       }
 
       if (metaValidator.isExposedComponentMetaMissing(config)) {
-        errors.addMissingExtensionMetaError();
+        msg.addMissingExtensionMetaError();
       }
 
       if (metaValidator.isExposedComponentTitlesNotMatching(config)) {
-        errors.addTitleMismatchError();
+        msg.addTitleMismatchError();
       }
 
-      // if (errors.hasItems) {
-      //   pointIdLog.error(errors.getLogMessage());
-      //   continue;
-      // }
-
-      pointIdLog.debug(`Exposed component extension successfully registered.`);
-
-      registry[id] = { ...config, pluginId };
+      if (!msg.HasErrors) {
+        registry[id] = { ...config, pluginId };
+      }
     }
 
     return registry;

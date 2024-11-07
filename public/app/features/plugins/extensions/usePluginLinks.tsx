@@ -51,7 +51,7 @@ export function usePluginLinks({
     }
 
     if (msg.HasErrors) {
-      msg.printResult(pointLog);
+      msg.print(pointLog);
       return {
         isLoading: false,
         links: [],

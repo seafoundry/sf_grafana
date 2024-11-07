@@ -44,7 +44,7 @@ export class AddedComponentsRegistry extends Registry<
         pluginId,
       });
 
-      const msg = new AddedComponentLogMessage(pluginId);
+      const msg = new AddedComponentLogMessage(configLog, pluginId);
       if (!config.title) {
         msg.addTitleMissingError();
       }
@@ -81,9 +81,8 @@ export class AddedComponentsRegistry extends Registry<
         } else {
           registry[extensionPointId].push(result);
         }
-
-        msg.printResult(pointIdLog);
       }
+      msg.print();
     }
 
     return registry;
