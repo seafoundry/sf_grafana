@@ -3,8 +3,9 @@ import { ReplaySubject } from 'rxjs';
 import { IconName, PluginExtensionAddedLinkConfig } from '@grafana/data';
 import { PluginAddedLinksConfigureFunc, PluginExtensionEventHelpers } from '@grafana/data/src/types/pluginExtensions';
 
-import { AddedLinkErrorMessages } from '../ErrorMessages';
+import { AddedLinkLogMessage } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
+import { isGrafanaDevMode } from '../utils';
 import {
   extensionPointEndsWithVersion,
   isConfigureFnValid,
@@ -43,8 +44,6 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
     const { pluginId, configs } = item;
 
     for (const config of configs) {
-      const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new AddedLinkErrorMessages(pluginId);
       const { path, title, description, configure, onClick, targets } = config;
       const configLog = this.logger.child({
         path: path ?? '',
@@ -53,38 +52,36 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
         pluginId,
         onClick: typeof onClick,
       });
+      const enableRestrictions = isGrafanaDevMode() && pluginId !== 'grafana';
+      const metaValidator = new ExtensionsValidator(pluginId);
+      const msg = new AddedLinkLogMessage(pluginId);
 
       if (!title) {
-        errors.addTitleMissingError();
+        msg.addTitleMissingError();
       }
 
       if (!description) {
-        errors.addDescriptionMissingError();
+        msg.addDescriptionMissingError();
       }
 
       if (!isConfigureFnValid(configure)) {
-        errors.addInvalidConfigureFnError();
+        msg.addInvalidConfigureFnError();
       }
 
       if (!path && !onClick) {
-        errors.addInvalidPathOrOnClickError();
+        msg.addInvalidPathOrOnClickError();
       }
 
       if (path && !isLinkPathValid(pluginId, path)) {
-        errors.addInvalidLinkPathError();
+        msg.addInvalidLinkPathError();
       }
 
       if (metaValidator.isAddedLinkMetaMissing(config)) {
-        errors.addMissingExtensionMetaError();
+        enableRestrictions ? msg.addMissingExtensionMetaError() : msg.addMissingExtensionMetaWarning();
       }
 
       if (metaValidator.isAddedLinkTargetsNotMatching(config)) {
-        errors.addInvalidExtensionTargetsError();
-      }
-
-      if (errors.hasErrors) {
-        configLog.error(errors.getLogMessage());
-        continue;
+        enableRestrictions ? msg.addInvalidExtensionTargetsError() : msg.addInvalidExtensionTargetsWarning();
       }
 
       const extensionPointIds = Array.isArray(targets) ? targets : [targets];
@@ -92,9 +89,7 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
         const pointIdLog = configLog.child({ extensionPointId });
 
         if (!isGrafanaCoreExtensionPoint(extensionPointId) && !extensionPointEndsWithVersion(extensionPointId)) {
-          pointIdLog.warning(
-            `It's recommended to suffix the extension point id ("${extensionPointId}") with a version, e.g 'myorg-basic-app/extension-point/v1'.`
-          );
+          msg.addMissingVersionSuffixWarning();
         }
 
         const { targets, ...registryItem } = config;
@@ -103,9 +98,8 @@ export class AddedLinksRegistry extends Registry<AddedLinkRegistryItem[], Plugin
           registry[extensionPointId] = [];
         }
 
-        pointIdLog.debug(`Link extension successfully registered.`);
-
         registry[extensionPointId].push({ ...registryItem, pluginId, extensionPointId });
+        msg.printResult(pointIdLog);
       }
     }
 

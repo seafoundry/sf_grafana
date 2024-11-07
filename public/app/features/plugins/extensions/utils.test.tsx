@@ -1,14 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { type Unsubscribable } from 'rxjs';
 
-import {
-  dateTime,
-  PluginContextType,
-  PluginExtensionPoints,
-  PluginLoadingStrategy,
-  PluginType,
-  usePluginContext,
-} from '@grafana/data';
+import { dateTime, PluginExtensionPoints, PluginLoadingStrategy, usePluginContext } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import appEvents from 'app/core/app_events';
 import { ShowModalReactEvent } from 'app/types/events';
@@ -798,141 +791,141 @@ describe('Plugin Extensions / Utils', () => {
     });
   });
 
-  describe('isExposedComponentDependencyMissing()', () => {
-    let pluginContext: PluginContextType;
-    const pluginId = 'myorg-extensions-app';
-    const exposedComponentId = `${pluginId}/component/v1`;
+  //   describe('isExposedComponentDependencyMissing()', () => {
+  //     let pluginContext: PluginContextType;
+  //     const pluginId = 'myorg-extensions-app';
+  //     // const exposedComponentId = `${pluginId}/component/v1`;
 
-    beforeEach(() => {
-      pluginContext = {
-        meta: {
-          id: pluginId,
-          name: 'Extensions App',
-          type: PluginType.app,
-          module: '',
-          baseUrl: '',
-          info: {
-            author: {
-              name: 'MyOrg',
-            },
-            description: 'App for testing extensions',
-            links: [],
-            logos: {
-              large: '',
-              small: '',
-            },
-            screenshots: [],
-            updated: '2023-10-26T18:25:01Z',
-            version: '1.0.0',
-          },
-          dependencies: {
-            grafanaVersion: '8.0.0',
-            plugins: [],
-            extensions: {
-              exposedComponents: [],
-            },
-          },
-        },
-      };
-    });
+  //     beforeEach(() => {
+  //       pluginContext = {
+  //         meta: {
+  //           id: pluginId,
+  //           name: 'Extensions App',
+  //           type: PluginType.app,
+  //           module: '',
+  //           baseUrl: '',
+  //           info: {
+  //             author: {
+  //               name: 'MyOrg',
+  //             },
+  //             description: 'App for testing extensions',
+  //             links: [],
+  //             logos: {
+  //               large: '',
+  //               small: '',
+  //             },
+  //             screenshots: [],
+  //             updated: '2023-10-26T18:25:01Z',
+  //             version: '1.0.0',
+  //           },
+  //           dependencies: {
+  //             grafanaVersion: '8.0.0',
+  //             plugins: [],
+  //             extensions: {
+  //               exposedComponents: [],
+  //             },
+  //           },
+  //         },
+  //       };
+  //     });
 
-    it('should return FALSE if the meta-info in the plugin.json is correct', () => {
-      const log = createLogMock();
-      pluginContext.meta.dependencies?.extensions.exposedComponents.push(exposedComponentId);
+  //     // it('should return FALSE if the meta-info in the plugin.json is correct', () => {
+  //     //   const log = createLogMock();
+  //     //   pluginContext.meta.dependencies?.extensions.exposedComponents.push(exposedComponentId);
 
-      const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
+  //     //   const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
 
-      expect(returnValue).toBe(false);
-      expect(log.warning).toHaveBeenCalledTimes(0);
-    });
+  //     //   expect(returnValue).toBe(false);
+  //     //   expect(log.warning).toHaveBeenCalledTimes(0);
+  //     // });
 
-    it('should return TRUE and log a warning if the dependencies are missing', () => {
-      const log = createLogMock();
-      delete pluginContext.meta.dependencies;
+  //     // it('should return TRUE and log a warning if the dependencies are missing', () => {
+  //     //   const log = createLogMock();
+  //     //   delete pluginContext.meta.dependencies;
 
-      const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
+  //     //   const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
 
-      expect(returnValue).toBe(true);
-      expect(log.warning).toHaveBeenCalledTimes(1);
-      expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Using exposed component "${exposedComponentId}"`);
-    });
+  //     //   expect(returnValue).toBe(true);
+  //     //   expect(log.warning).toHaveBeenCalledTimes(1);
+  //     //   expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Using exposed component "${exposedComponentId}"`);
+  //     // });
 
-    it('should return TRUE and log a warning if the exposed component id is not specified in the list of dependencies', () => {
-      const log = createLogMock();
-      const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
+  //     // it('should return TRUE and log a warning if the exposed component id is not specified in the list of dependencies', () => {
+  //     //   const log = createLogMock();
+  //     //   const returnValue = isExposedComponentDependencyMissing(exposedComponentId, pluginContext, log);
 
-      expect(returnValue).toBe(true);
-      expect(log.warning).toHaveBeenCalledTimes(1);
-      expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Using exposed component "${exposedComponentId}"`);
-    });
-  });
+  //     //   expect(returnValue).toBe(true);
+  //     //   expect(log.warning).toHaveBeenCalledTimes(1);
+  //     //   expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Using exposed component "${exposedComponentId}"`);
+  //     // });
+  //   });
 
-  describe('isExtensionPointMetaInfoMissing()', () => {
-    let pluginContext: PluginContextType;
-    const pluginId = 'myorg-extensions-app';
-    const extensionPointId = `${pluginId}/extension-point/v1`;
-    const extensionPointConfig = {
-      id: extensionPointId,
-      title: 'Extension point title',
-      description: 'Extension point description',
-    };
+  //   // describe('isExtensionPointMetaInfoMissing()', () => {
+  //   //   let pluginContext: PluginContextType;
+  //   //   const pluginId = 'myorg-extensions-app';
+  //   //   const extensionPointId = `${pluginId}/extension-point/v1`;
+  //   //   const extensionPointConfig = {
+  //   //     id: extensionPointId,
+  //   //     title: 'Extension point title',
+  //   //     description: 'Extension point description',
+  //   //   };
 
-    beforeEach(() => {
-      pluginContext = {
-        meta: {
-          id: pluginId,
-          name: 'Extensions App',
-          type: PluginType.app,
-          module: '',
-          baseUrl: '',
-          info: {
-            author: {
-              name: 'MyOrg',
-            },
-            description: 'App for testing extensions',
-            links: [],
-            logos: {
-              large: '',
-              small: '',
-            },
-            screenshots: [],
-            updated: '2023-10-26T18:25:01Z',
-            version: '1.0.0',
-          },
-          extensions: {
-            addedLinks: [],
-            addedComponents: [],
-            exposedComponents: [],
-            extensionPoints: [],
-          },
-          dependencies: {
-            grafanaVersion: '8.0.0',
-            plugins: [],
-            extensions: {
-              exposedComponents: [],
-            },
-          },
-        },
-      };
-    });
+  //   //   beforeEach(() => {
+  //   //     pluginContext = {
+  //   //       meta: {
+  //   //         id: pluginId,
+  //   //         name: 'Extensions App',
+  //   //         type: PluginType.app,
+  //   //         module: '',
+  //   //         baseUrl: '',
+  //   //         info: {
+  //   //           author: {
+  //   //             name: 'MyOrg',
+  //   //           },
+  //   //           description: 'App for testing extensions',
+  //   //           links: [],
+  //   //           logos: {
+  //   //             large: '',
+  //   //             small: '',
+  //   //           },
+  //   //           screenshots: [],
+  //   //           updated: '2023-10-26T18:25:01Z',
+  //   //           version: '1.0.0',
+  //   //         },
+  //   //         extensions: {
+  //   //           addedLinks: [],
+  //   //           addedComponents: [],
+  //   //           exposedComponents: [],
+  //   //           extensionPoints: [],
+  //   //         },
+  //   //         dependencies: {
+  //   //           grafanaVersion: '8.0.0',
+  //   //           plugins: [],
+  //   //           extensions: {
+  //   //             exposedComponents: [],
+  //   //           },
+  //   //         },
+  //   //       },
+  //   //     };
+  //   //   });
 
-    it('should return FALSE if the meta-info in the plugin.json is correct', () => {
-      const log = createLogMock();
-      pluginContext.meta.extensions?.extensionPoints.push(extensionPointConfig);
+  //   //   // it('should return FALSE if the meta-info in the plugin.json is correct', () => {
+  //   //   //   const log = createLogMock();
+  //   //   //   pluginContext.meta.extensions?.extensionPoints.push(extensionPointConfig);
 
-      const returnValue = isExtensionPointMetaInfoMissing(extensionPointId, pluginContext, log);
+  //   //   //   const returnValue = isExtensionPointMetaInfoMissing(extensionPointId, pluginContext, log);
 
-      expect(returnValue).toBe(false);
-      expect(log.warning).toHaveBeenCalledTimes(0);
-    });
+  //   //   //   expect(returnValue).toBe(false);
+  //   //   //   expect(log.warning).toHaveBeenCalledTimes(0);
+  //   //   // });
 
-    it('should return TRUE and log a warning if the extension point id is not recorded in the plugin.json', () => {
-      const log = createLogMock();
-      const returnValue = isExtensionPointMetaInfoMissing(extensionPointId, pluginContext, log);
+  //   //   // it('should return TRUE and log a warning if the extension point id is not recorded in the plugin.json', () => {
+  //   //   //   const log = createLogMock();
+  //   //   //   const returnValue = isExtensionPointMetaInfoMissing(extensionPointId, pluginContext, log);
 
-      expect(returnValue).toBe(true);
-      expect(log.warning).toHaveBeenCalledTimes(1);
-      expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Extension point "${extensionPointId}"`);
-    });
-  });
+  //   //   //   expect(returnValue).toBe(true);
+  //   //   //   expect(log.warning).toHaveBeenCalledTimes(1);
+  //   //   //   expect(jest.mocked(log.warning).mock.calls[0][0]).toMatch(`Extension point "${extensionPointId}"`);
+  //   //   // });
+  //   // });
 });

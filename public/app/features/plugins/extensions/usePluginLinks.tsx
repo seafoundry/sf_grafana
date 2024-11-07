@@ -8,7 +8,7 @@ import {
   UsePluginLinksResult,
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
-import { ExtensionPointErrorMessages } from './ErrorMessages';
+import { ExtensionPointLogMessage } from './ErrorMessages';
 import { useAddedLinksRegistry } from './ExtensionRegistriesContext';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
@@ -18,6 +18,7 @@ import {
   getLinkExtensionOverrides,
   getLinkExtensionPathWithTracking,
   getReadOnlyProxy,
+  isGrafanaDevMode,
 } from './utils';
 
 // Returns an array of component extensions for the given extension point
@@ -33,23 +34,24 @@ export function usePluginLinks({
   return useMemo(() => {
     // For backwards compatibility we don't enable restrictions in production or when the hook is used in core Grafana.
     const pluginId = pluginContext?.meta.id ?? '';
+    const enableRestrictions = isGrafanaDevMode() && pluginContext;
     const validator = new ExtensionPointValidator(pluginId, pluginContext);
-    const errors = new ExtensionPointErrorMessages(pluginId);
+    const msg = new ExtensionPointLogMessage(pluginId);
     const pointLog = log.child({
       pluginId,
       extensionPointId,
     });
 
     if (validator.isExtensionPointIdInvalid(extensionPointId)) {
-      errors.addInvalidIdError();
+      msg.addInvalidIdError();
     }
 
     if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
-      errors.addMissingMetaInfoError();
+      enableRestrictions ? msg.addMissingMetaInfoError() : msg.addMissingMetaInfoWarning();
     }
 
-    if (errors.hasErrors) {
-      pointLog.error(errors.getLogMessage());
+    if (msg.HasErrors) {
+      msg.printResult(pointLog);
       return {
         isLoading: false,
         links: [],

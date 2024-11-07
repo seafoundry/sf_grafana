@@ -4,7 +4,7 @@ import { useObservable } from 'react-use';
 import { PluginExtension, usePluginContext } from '@grafana/data';
 import { GetPluginExtensionsOptions, UsePluginExtensionsResult } from '@grafana/runtime';
 
-import { ExtensionPointErrorMessages } from './ErrorMessages';
+import { ExtensionPointLogMessage } from './ErrorMessages';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { getPluginExtensions } from './getPluginExtensions';
 import { log } from './logs/log';
@@ -25,7 +25,7 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
       const pluginId = pluginContext?.meta.id ?? '';
 
       const validator = new ExtensionPointValidator(pluginId, pluginContext);
-      const errors = new ExtensionPointErrorMessages(pluginId);
+      const errors = new ExtensionPointLogMessage(pluginId);
       const pointLog = log.child({
         pluginId,
         extensionPointId,
@@ -43,13 +43,13 @@ export function createUsePluginExtensions(registries: PluginExtensionRegistries)
         errors.addMissingMetaInfoError();
       }
 
-      if (errors.hasErrors) {
-        pointLog.error(errors.getLogMessage());
-        return {
-          isLoading: false,
-          extensions: [],
-        };
-      }
+      // if (errors.hasItems) {
+      //   pointLog.error(errors.getLogMessage());
+      //   return {
+      //     isLoading: false,
+      //     extensions: [],
+      //   };
+      // }
 
       return getPluginExtensions({
         extensionPointId,

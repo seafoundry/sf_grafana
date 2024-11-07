@@ -7,10 +7,11 @@ import {
   UsePluginComponentsResult,
 } from '@grafana/runtime/src/services/pluginExtensions/getPluginExtensions';
 
-import { ExtensionPointErrorMessages } from './ErrorMessages';
+import { ExtensionPointLogMessage } from './ErrorMessages';
 import { useAddedComponentsRegistry } from './ExtensionRegistriesContext';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
+import { isGrafanaDevMode } from './utils';
 
 // Returns an array of component extensions for the given extension point
 export function usePluginComponents<Props extends object = {}>({
@@ -26,23 +27,24 @@ export function usePluginComponents<Props extends object = {}>({
     const components: Array<React.ComponentType<Props>> = [];
     const extensionsByPlugin: Record<string, number> = {};
     const pluginId = pluginContext?.meta.id ?? '';
+    const enableRestrictions = isGrafanaDevMode() && pluginContext;
     const validator = new ExtensionPointValidator(pluginId, pluginContext);
-    const errors = new ExtensionPointErrorMessages(pluginId);
+    const msg = new ExtensionPointLogMessage(pluginId);
     const pointLog = log.child({
       pluginId,
       extensionPointId,
     });
 
     if (validator.isExtensionPointIdInvalid(extensionPointId)) {
-      errors.addInvalidIdError();
+      msg.addInvalidIdError();
     }
 
     if (validator.isExtensionPointMetaInfoMissing(extensionPointId)) {
-      errors.addMissingMetaInfoError();
+      enableRestrictions ? msg.addMissingMetaInfoError() : msg.addMissingMetaInfoWarning();
     }
 
-    if (errors.hasErrors) {
-      pointLog.error(errors.getLogMessage());
+    if (msg.HasErrors) {
+      msg.printResult(pointLog);
       return {
         isLoading: false,
         components: [],

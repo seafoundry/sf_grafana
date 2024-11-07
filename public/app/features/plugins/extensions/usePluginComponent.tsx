@@ -4,11 +4,11 @@ import { useObservable } from 'react-use';
 import { usePluginContext } from '@grafana/data';
 import { UsePluginComponentResult } from '@grafana/runtime';
 
-import { ExposedComponentErrorMessages } from './ErrorMessages';
+import { ExposedComponentLogMessage } from './ErrorMessages';
 import { useExposedComponentsRegistry } from './ExtensionRegistriesContext';
 import { ExtensionPointValidator } from './ExtensionsValidator';
 import { log } from './logs/log';
-import { wrapWithPluginContext } from './utils';
+import { isGrafanaDevMode, wrapWithPluginContext } from './utils';
 
 // Returns a component exposed by a plugin.
 // (Exposed components can be defined in plugins by calling .exposeComponent() on the AppPlugin instance.)
@@ -34,14 +34,13 @@ export function usePluginComponent<Props extends object = {}>(id: string): UsePl
       pluginId: registryItem.pluginId,
     });
 
+    const enableRestrictions = isGrafanaDevMode() && pluginContext;
     const validator = new ExtensionPointValidator(registryItem.pluginId, pluginContext);
-    const errors = new ExposedComponentErrorMessages(registryItem.pluginId);
+    const msg = new ExposedComponentLogMessage(registryItem.pluginId);
 
     if (validator.isExposedComponentDependencyMissing(id)) {
-      errors.addMissingDependencyInfoError();
-      componentLog.error(
-        `Invalid usage of exposed component. Reason: The exposed component is not declared in the "plugin.json" file. Exposed components must be listed in the dependencies[] section.`
-      );
+      enableRestrictions ? msg.addMissingDependencyInfoError() : msg.addMissingDependencyInfoWarning();
+      msg.printResult(componentLog);
       return {
         isLoading: false,
         component: null,

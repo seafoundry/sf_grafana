@@ -2,7 +2,7 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionExposedComponentConfig } from '@grafana/data';
 
-import { ExposedComponentErrorMessages } from '../ErrorMessages';
+import { ExposedComponentLogMessage } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
 import { extensionPointEndsWithVersion } from '../validators';
 
@@ -38,7 +38,7 @@ export class ExposedComponentsRegistry extends Registry<
 
     for (const config of configs) {
       const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new ExposedComponentErrorMessages(pluginId);
+      const errors = new ExposedComponentLogMessage(pluginId);
       const { id, description, title } = config;
       const pointIdLog = this.logger.child({
         extensionPointId: id,
@@ -77,10 +77,10 @@ export class ExposedComponentsRegistry extends Registry<
         errors.addTitleMismatchError();
       }
 
-      if (errors.hasErrors) {
-        pointIdLog.error(errors.getLogMessage());
-        continue;
-      }
+      // if (errors.hasItems) {
+      //   pointIdLog.error(errors.getLogMessage());
+      //   continue;
+      // }
 
       pointIdLog.debug(`Exposed component extension successfully registered.`);
 

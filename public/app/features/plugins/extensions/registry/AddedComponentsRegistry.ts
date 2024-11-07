@@ -2,9 +2,9 @@ import { ReplaySubject } from 'rxjs';
 
 import { PluginExtensionAddedComponentConfig } from '@grafana/data';
 
-import { AddedComponentErrorMessages } from '../ErrorMessages';
+import { AddedComponentLogMessage } from '../ErrorMessages';
 import { ExtensionsValidator } from '../ExtensionsValidator';
-import { wrapWithPluginContext } from '../utils';
+import { isGrafanaDevMode, wrapWithPluginContext } from '../utils';
 import { extensionPointEndsWithVersion, isGrafanaCoreExtensionPoint } from '../validators';
 
 import { PluginExtensionConfigs, Registry, RegistryType } from './Registry';
@@ -36,33 +36,29 @@ export class AddedComponentsRegistry extends Registry<
     const { pluginId, configs } = item;
 
     for (const config of configs) {
+      const enableRestrictions = isGrafanaDevMode() && pluginId !== 'grafana';
       const metaValidator = new ExtensionsValidator(pluginId);
-      const errors = new AddedComponentErrorMessages(pluginId);
       const configLog = this.logger.child({
         description: config.description,
         title: config.title,
         pluginId,
       });
 
+      const msg = new AddedComponentLogMessage(pluginId);
       if (!config.title) {
-        errors.addTitleMissingError();
+        msg.addTitleMissingError();
       }
 
       if (!config.description) {
-        errors.addDescriptionMissingError();
+        msg.addDescriptionMissingError();
       }
 
       if (metaValidator.isAddedComponentMetaMissing(config)) {
-        errors.addMissingExtensionMetaError();
+        enableRestrictions ? msg.addMissingExtensionMetaError() : msg.addMissingExtensionMetaWarning();
       }
 
       if (metaValidator.isAddedComponentTargetsNotMatching(config)) {
-        errors.addInvalidExtensionTargetsError();
-      }
-
-      if (errors.hasErrors) {
-        configLog.error(errors.getLogMessage());
-        continue;
+        enableRestrictions ? msg.addInvalidExtensionTargetsError() : msg.addInvalidExtensionTargetsWarning();
       }
 
       const extensionPointIds = Array.isArray(config.targets) ? config.targets : [config.targets];
@@ -70,9 +66,7 @@ export class AddedComponentsRegistry extends Registry<
         const pointIdLog = configLog.child({ extensionPointId });
 
         if (!isGrafanaCoreExtensionPoint(extensionPointId) && !extensionPointEndsWithVersion(extensionPointId)) {
-          pointIdLog.warning(
-            `It's recommended to suffix the extension point id ("${extensionPointId}") with a version, e.g 'myorg-basic-app/extension-point/v1'.`
-          );
+          msg.addMissingVersionSuffixWarning();
         }
 
         const result = {
@@ -82,13 +76,13 @@ export class AddedComponentsRegistry extends Registry<
           title: config.title,
         };
 
-        pointIdLog.debug(`Component extension successfully registered.`);
-
         if (!(extensionPointId in registry)) {
           registry[extensionPointId] = [result];
         } else {
           registry[extensionPointId].push(result);
         }
+
+        msg.printResult(pointIdLog);
       }
     }
 
