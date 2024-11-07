@@ -8,7 +8,7 @@ ARG GO_IMAGE=golang:1.23.1-alpine
 ARG GO_SRC=go-builder
 ARG JS_SRC=js-builder
 
-FROM --platform=${JS_PLATFORM} ${JS_IMAGE} as js-builder
+FROM --platform=${JS_PLATFORM} ${JS_IMAGE} AS js-builder
 
 ENV NODE_OPTIONS=--max_old_space_size=8000
 
@@ -24,16 +24,16 @@ COPY conf/defaults.ini ./conf/defaults.ini
 
 RUN apk add --no-cache make build-base python3
 
-RUN yarn install --immutable
+RUN yarn install
 
 COPY tsconfig.json eslint.config.js .editorconfig .browserslistrc .prettierrc.js ./
 COPY scripts scripts
 COPY emails emails
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 RUN yarn build
 
-FROM ${GO_IMAGE} as go-builder
+FROM ${GO_IMAGE} AS go-builder
 
 ARG COMMIT_SHA=""
 ARG BUILD_BRANCH=""
@@ -47,7 +47,7 @@ RUN if grep -i -q alpine /etc/issue; then \
           binutils-gold \
           bash \
           # Install build dependencies
-          gcc g++ make git; \
+          gcc g++ make git bash; \
     fi
 
 WORKDIR /tmp/grafana
@@ -56,17 +56,17 @@ COPY go.* ./
 COPY .bingo .bingo
 
 # Include vendored dependencies
-COPY pkg/util/xorm/go.* pkg/util/xorm/
-COPY pkg/apiserver/go.* pkg/apiserver/
-COPY pkg/apimachinery/go.* pkg/apimachinery/
-COPY pkg/build/go.* pkg/build/
-COPY pkg/build/wire/go.* pkg/build/wire/
-COPY pkg/promlib/go.* pkg/promlib/
-COPY pkg/storage/unified/resource/go.* pkg/storage/unified/resource/
-COPY pkg/storage/unified/apistore/go.* pkg/storage/unified/apistore/
-COPY pkg/semconv/go.* pkg/semconv/
-COPY pkg/aggregator/go.* pkg/aggregator/
-COPY apps/playlist/go.* apps/playlist/
+COPY pkg/util/xorm pkg/util/xorm
+COPY pkg/apiserver pkg/apiserver
+COPY pkg/apimachinery pkg/apimachinery
+COPY pkg/build pkg/build
+COPY pkg/build/wire pkg/build/wire
+COPY pkg/promlib pkg/promlib
+COPY pkg/storage/unified/resource pkg/storage/unified/resource
+COPY pkg/storage/unified/apistore pkg/storage/unified/apistore
+COPY pkg/semconv pkg/semconv
+COPY pkg/aggregator pkg/aggregator
+COPY apps/playlist apps/playlist
 
 RUN go mod download
 RUN if [[ "$BINGO" = "true" ]]; then \
@@ -91,7 +91,7 @@ ENV BUILD_BRANCH=${BUILD_BRANCH}
 
 RUN make build-go GO_BUILD_TAGS=${GO_BUILD_TAGS} WIRE_TAGS=${WIRE_TAGS}
 
-FROM ${BASE_IMAGE} as tgz-builder
+FROM ${BASE_IMAGE} AS tgz-builder
 
 WORKDIR /tmp/grafana
 
@@ -103,8 +103,8 @@ COPY ${GRAFANA_TGZ} /tmp/grafana.tar.gz
 RUN tar x -z -f /tmp/grafana.tar.gz --strip-components=1
 
 # helpers for COPY --from
-FROM ${GO_SRC} as go-src
-FROM ${JS_SRC} as js-src
+FROM ${GO_SRC} AS go-src
+FROM ${JS_SRC} AS js-src
 
 # Final stage
 FROM ${BASE_IMAGE}
