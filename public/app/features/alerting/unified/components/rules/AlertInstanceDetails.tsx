@@ -15,7 +15,7 @@ export const AlertInstanceDetails = ({ instance }: Props) => {
   return (
     <div>
       {instance.value && (
-        <DetailsField label="Value" horizontal={true}>
+        <DetailsField label="ValueIs" horizontal={true}>
           {instance.value}
         </DetailsField>
       )}

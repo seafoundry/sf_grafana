@@ -9,8 +9,10 @@ import { AlertLabels } from '../AlertLabels';
 import { DynamicTable, DynamicTableColumnProps, DynamicTableItemProps } from '../DynamicTable';
 import { AlertInstanceExtensionPoint } from '../extensions/AlertInstanceExtensionPoint';
 
-import { AlertInstanceDetails } from './AlertInstanceDetails';
-import { AlertStateTag } from './AlertStateTag';
+//import { AlertInstanceDetails } from './AlertInstanceDetails';
+//import { AlertStateTag } from './AlertStateTag';
+//import { chain } from 'lodash';
+//import { isPrivateLabel } from '../../utils/labels';
 
 interface Props {
   rule?: CombinedRule;
@@ -31,6 +33,14 @@ interface RuleAndAlert {
 type AlertTableColumnProps = DynamicTableColumnProps<RuleAndAlert>;
 type AlertTableItemProps = DynamicTableItemProps<RuleAndAlert>;
 
+function filteredLabels(labels: Record<string, string>): Record<string, string> {
+  console.log(labels);
+  const myRecord: Record<string, string> = {
+    '': labels.container_id,
+  };
+  return myRecord;
+}
+
 export const AlertInstancesTable = ({ rule, instances, pagination, footerRow }: Props) => {
   const commonLabels = useMemo(() => {
     // only compute the common labels if we have more than 1 instance, if we don't then that single instance
@@ -50,9 +60,9 @@ export const AlertInstancesTable = ({ rule, instances, pagination, footerRow }: 
   return (
     <DynamicTable
       cols={columns}
-      isExpandable={true}
+      //isExpandable={true}
       items={items}
-      renderExpandedContent={({ data }) => <AlertInstanceDetails instance={data.alert} />}
+      //renderExpandedContent={({ data }) => <AlertInstanceDetails instance={data.alert} />}
       pagination={pagination}
       footerRow={footerRow}
     />
@@ -60,7 +70,7 @@ export const AlertInstancesTable = ({ rule, instances, pagination, footerRow }: 
 };
 
 const columns: AlertTableColumnProps[] = [
-  {
+  /*{
     id: 'state',
     label: 'State',
     // eslint-disable-next-line react/display-name
@@ -70,26 +80,28 @@ const columns: AlertTableColumnProps[] = [
       },
     }) => <AlertStateTag state={state} />,
     size: '80px',
-  },
+  },*/
   {
     id: 'labels',
-    label: 'Labels',
+    label: 'Location',
     // eslint-disable-next-line react/display-name
     renderCell: ({
       data: {
         alert: { labels, commonLabels },
       },
-    }) => <AlertLabels labels={labels} commonLabels={commonLabels} size="sm" />,
+    }) => <AlertLabels labels={filteredLabels(labels)} commonLabels={commonLabels} size="sm" />,
   },
   {
     id: 'created',
-    label: 'Created',
+    label: 'Last Value',
     // eslint-disable-next-line react/display-name
     renderCell: ({
       data: {
-        alert: { activeAt },
+        alert: { activeAt, value },
       },
-    }) => <>{activeAt.startsWith('0001') ? '-' : dateTime(activeAt).format('YYYY-MM-DD HH:mm:ss')}</>,
+    }) => (
+      <>{`${value} at `.concat(activeAt.startsWith('0001') ? '-' : dateTime(activeAt).format('YYYY-MM-DD HH:mm:ss'))}</>
+    ),
     size: '150px',
   },
   {

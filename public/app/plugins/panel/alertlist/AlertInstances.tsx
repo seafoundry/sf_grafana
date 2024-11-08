@@ -34,8 +34,8 @@ export const AlertInstances = ({
   limitInstances,
   grafanaFilteredInstancesTotal,
 }: Props) => {
-  // when custom grouping is enabled, we will always uncollapse the list of alert instances
-  const defaultShowInstances = options.groupMode === GroupMode.Custom ? true : options.showInstances;
+  // start with instances exapnded // when custom grouping is enabled, we will always uncollapse the list of alert instances
+  const defaultShowInstances = true; //options.groupMode === GroupMode.Custom ? true : options.showInstances;
   const [displayInstances, setDisplayInstances] = useState<boolean>(defaultShowInstances);
   const styles = useStyles2(getStyles);
   const clearButton = useStyles2(clearButtonStyles);

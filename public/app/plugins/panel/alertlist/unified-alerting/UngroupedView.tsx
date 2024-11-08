@@ -84,7 +84,7 @@ const UngroupedModeView = ({ rules, options, handleInstancesLimit, limitInstance
                   <div className={styles.instanceDetails}>
                     <Stack direction="row" gap={1}>
                       <div className={styles.alertName} title={ruleWithLocation.name}>
-                        {ruleWithLocation.name}
+                        {ruleWithLocation.name} IS YO PROBLEM!
                       </div>
                       <Spacer />
                       {href && (
