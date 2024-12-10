@@ -279,6 +279,9 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
   if (!type) {
     return null;
   }
+
+  const isSimple = true;
+
   return (
     <FormProvider {...formAPI}>
       <AppChromeUpdate actions={actionButtons} />
@@ -310,9 +313,9 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
 
                   {/* Step 4 & 5 */}
                   {/* Notifications step*/}
-                  <NotificationsStep alertUid={uidFromParams} />
+                  {!isSimple && <NotificationsStep alertUid={uidFromParams} />}
                   {/* Annotations only for cloud and Grafana */}
-                  {!isRecordingRuleByType(type) && <AnnotationsStep />}
+                  {!isRecordingRuleByType(type) && !isSimple && <AnnotationsStep />}
                 </>
               )}
             </Stack>

@@ -124,7 +124,7 @@ export const getDefautManualRouting = () => {
   //then, check in local storage if the user has enabled simplified routing
   // if it's not set, we'll default to true
   const manualRouting = localStorage.getItem(MANUAL_ROUTING_KEY);
-  return manualRouting !== 'false';
+  return manualRouting !== 'true';
 };
 
 function getDefaultEditorSettings() {

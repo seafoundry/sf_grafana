@@ -42,7 +42,7 @@ export const AlertRuleNameAndMetric = () => {
       title={`Enter ${entityName} name`}
       description={
         <Text variant="bodySmall" color="secondary">
-          Enter a name to identify your {entityName}.
+          Enter a name to identify your {entityName}, dearest coral G.
         </Text>
       }
     >
